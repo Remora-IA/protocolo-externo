@@ -39,7 +39,7 @@ estar desalineados con el método actual.
 
 Antes de que cualquier lente corra (y después del Version Doctor), el
 orquestador delega al **Brief Doctor** (`prompts/brief-doctor.md`). El
-doctor audita 7 piezas:
+doctor audita 11 piezas:
 
 1. `why.md` (problema, persona, cambio producido).
 2. BRIEF.Propósito + JTBD.
@@ -49,6 +49,16 @@ doctor audita 7 piezas:
 6. BRIEF.Fuentes de verdad (concretas y accesibles).
 7. Coherencia cruzada (¿la descripción mínima podría describir un producto
    wrong-job? ¿las fuentes pueden responder si cumple el JTBD?).
+8. BRIEF.Fronteras explícitas (qué el producto NO es) — habilita anti-axiomas
+   y licencia a Sustracción.
+9. BRIEF.Roles y sus jobs respectivos — habilita análisis multi-rol y
+   RE-RUTEAR en vez de SUBTRACT.
+10. BRIEF.Fase del MVP y alcance explícito — distingue gaps reales de
+    scope-out deliberado de la fase actual.
+11. BRIEF.Mapa de intenciones del usuario (Intent Map) — granularidad
+    momento-de-sesión por debajo del JTBD. Habilita K/N por intención
+    (F1), auditoría de navegación per-intención (JUEZ) y RE-RUTEAR
+    genuino (Sustracción Test 1).
 
 Si todo está OK, no toca nada. Si falta o hay incoherencia, hace UNA
 tanda de preguntas profesionales y patchea sólo lo necesario. Si no se
@@ -114,12 +124,14 @@ El **mapa de axiomas** generado por Discovery se vuelve el contrato que
 Lente 0/A/B/C usan para anclar sus findings. Cualquier finding que no se
 ancla a un axioma específico va al backlog observado.
 
-## 5. Las siete lentes de evaluación de producto
+## 5. Las ocho lentes de evaluación de producto
 
 Tres miden **calidad funcional** (errores: 0, A, B). Tres miden **calidad
 estratégica aditiva** (ausencias y dinámica de uso: Guiado, Simulación
 Persona, Discovery). Una mide **calidad estratégica sustractiva**
-(exceso de elementos: Sustracción). Son complementarias, no redundantes.
+(exceso de elementos: Sustracción). Una mide **calidad estratégica
+inversa** (trampas heredadas del antiproducto: Inversión). Son
+complementarias, no redundantes.
 
 > **Por qué Sustracción existe.** Las otras seis lentes están sesgadas a
 > agregar (clarificar, guiar, unificar, consolidar). Sin un contrapeso
@@ -127,6 +139,16 @@ Persona, Discovery). Una mide **calidad estratégica sustractiva**
 > es el antagonista del protocolo: su prejuicio default es "esto sobra
 > hasta que un axioma lo demande". Sin ella, el ratio doc/código se
 > dispara y los productos acumulan ruido competitivo.
+
+> **Por qué Inversión existe.** Sustracción y las lentes aditivas
+> comparten el mismo punto ciego: todas operan desde *"¿cómo está
+> bien o cómo mejorarlo?"*. Inversión opera desde *"¿qué pondría
+> alguien que quiere que esto falle?"*. Sustracción encuentra ruido
+> (elementos sin axioma); Inversión encuentra **trampas** (elementos
+> que el equipo agregó con buena intención pero que copian patrones
+> del antiproducto sin querer). En productos en fase temprana
+> (skate / scooter), Inversión es especialmente útil porque las
+> decisiones de diseño todavía son reversibles con bajo costo.
 
 ### Fase del MVP — eje temporal del análisis
 
@@ -214,13 +236,26 @@ devolver al Brief Doctor para re-declarar Pieza 9 antes de seguir.
   Lente de kickoff o re-kickoff, no de cada ciclo. Prompt:
   `~/.claude/qa-ux/prompts/lente-fasing.md`.
 - **Lente de Sustracción — First Principles aplicado al inventario.**
-  Sesión experta con BRIEF + mapa de axiomas. Para cada elemento visible
-  del producto aplica 3 tests: (1) JTBD-compleción sin él, (2)
-  axiom-soporte, (3) carga cognitiva vs valor único. Output: **top 5
-  subtract proposals** anclados a axiomas. **No escribe al ledger
-  directamente** — borrar es irreversible más rápido que agregar, por lo
-  que requiere checkpoint humano antes de Lente C. Prompt:
+  Sesión experta con BRIEF + mapa de axiomas + Intent Map. Para cada
+  elemento visible del producto aplica 3 tests: (1) JTBD-compleción
+  per-intención del Intent Map, (2) axiom-soporte, (3) carga cognitiva
+  vs valor único. Output: **top 5 subtract proposals** anclados a
+  axiomas + intenciones. Habilita RE-RUTEAR genuino (elemento que
+  sirve a intención X pero está visible mientras intención Y está
+  activa). **No escribe al ledger directamente** — borrar es
+  irreversible más rápido que agregar, por lo que requiere checkpoint
+  humano antes de Lente C. Prompt:
   `~/.claude/qa-ux/prompts/lente-sustraccion.md`.
+- **Lente de Inversión — antiproblem solving aplicado al Intent Map.**
+  Sesión adversarial con Intent Map + axiomas. Por cada intención
+  declarada, diseña el **peor flujo posible** ("¿qué pondría alguien
+  que quiere que el usuario falle?") y lo compara con el actual.
+  Output: **top 5 coincidencias actual ↔ antiproducto**, ancladas a
+  axiomas violados. Detecta trampas heredadas que Sustracción no ve
+  (Sustracción pregunta "¿esto sobra?"; Inversión pregunta "¿esto es
+  lo que pondría un mal diseño?"). Invocable desde F2 cuando
+  Sustracción dio ≤2 candidatos pero F1 reportó síntomas. Prompt:
+  `~/.claude/qa-ux/prompts/lente-inversion.md`.
 - **Lente C — síntesis.** No navega. Lee reportes de 0, A y B. Deduplica,
   jerarquiza **por impacto al JTBD** y escribe **sólo top 3 al ledger**.
   El resto va a backlog observado. Los subtract proposals confirmados por

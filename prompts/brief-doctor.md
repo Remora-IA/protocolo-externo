@@ -23,7 +23,7 @@ es diagnosticar cuál sección falla y arreglarla.
 - Directorio del proyecto (cwd).
 - Acceso a `Read`, `Write`, `Edit`, `AskUserQuestion`, `Bash` (para ls/scan).
 
-## Las 7 piezas que verificás
+## Las 11 piezas que verificás
 
 ### 1. `why.md` (en raíz del proyecto)
 
@@ -193,6 +193,94 @@ misma persona usa el producto de modos distintos en momentos distintos?
 ¿hay un equipo interno tuyo que también entra al panel? Si la respuesta
 es sí en cualquiera, listame cada rol con su job."*
 
+### 11. Mapa de intenciones del usuario (Intent Map)
+
+Las intenciones del usuario son **el nivel más granular del BRIEF**: por
+debajo del JTBD, por debajo de los axiomas. Una intención es un **momento
+de sesión** con trigger, outcome esperado del mundo real, frecuencia
+conocida, y rol asociado. Sin esta pieza, cada lente del skill defaultea
+a *"la pantalla X sirve LA tarea"* — pero la mayoría de las pantallas
+sirven a MÚLTIPLES intenciones con peso desigual, y los gaps reales viven
+en esa desigualdad.
+
+Ejemplo (Kobra Fase 1, rol operadora):
+
+- *"Primera vez: quiero entender si esto realmente funciona antes de
+  confiarle deudores reales."* — trigger: primer login · outcome: tengo
+  convicción para subir mi lista · frecuencia: única · surfaces
+  esperadas: explicación + simulación segura.
+- *"Primera vez: tengo mi lista de deudores entera lista, quiero subirla
+  y arrancar."* — trigger: primer login post-decisión · outcome:
+  deudores en sistema, Carolina activa · frecuencia: única · surfaces
+  esperadas: importer + confirmación de envío.
+- *"Recurrente diaria: ¿pasó algo que necesite mi atención?"* — trigger:
+  login del día · outcome: sé qué casos requieren acción humana hoy ·
+  frecuencia: alta · surfaces esperadas: lista priorizada de pendientes
+  con acción clara.
+- *"Mid-mes: quiero sumar un deudor más."* — trigger: nuevo crédito
+  vencido · outcome: deudor agregado, Carolina lo contacta · frecuencia:
+  recurrente media · surfaces esperadas: alta puntual sin pasar por
+  importer.
+- *"Recurrente baja: necesito cambiar cómo habla Carolina con un
+  perfil."* — trigger: el founder vio una conversación que no le gustó ·
+  outcome: Carolina ajusta tono o regla · frecuencia: baja · surfaces
+  esperadas: configuración del agente.
+
+**Por intención, declarar:**
+
+- **Nombre corto** — etiqueta para referencia cruzada con lentes.
+- **Trigger** — qué hace que el usuario abra el producto para hacer ESTA
+  cosa específica. No "el usuario quiere X" sino "pasa Y afuera del
+  producto y por eso el usuario lo abre".
+- **Outcome mundo-real** — qué cambia **afuera** del producto cuando la
+  intención se cumple. NO *"vio la pantalla X"* sino *"envió la planilla
+  a su contador"*, *"supo que la deuda se cobró"*, *"durmió tranquila
+  esa noche"*.
+- **Frecuencia** — única / setup / recurrente-alta / recurrente-media /
+  recurrente-baja / mid-task.
+- **Rol** — cuál de los Pieza 9 la tiene. Una intención por rol; si dos
+  roles tienen la misma intención con outcome distinto, son dos.
+- **Surfaces esperadas** — qué UI debería **dominar visualmente** cuando
+  la intención está activa. No "qué UI debería existir" (eso es F3) sino
+  "qué debería atraer el ojo primero cuando esta intención trajo al
+  usuario acá".
+
+**Falla si:**
+- El BRIEF habla de *"el usuario hace X"* como si hubiera UN solo flujo.
+- Las intenciones se confunden con pantallas (*"la intención es usar el
+  dashboard"* — no, eso es un destino, no una intención).
+- Falta la **frecuencia**. Sin frecuencia, el skill no puede distinguir
+  qué intención merece dominio visual de la home vs cuál merece acceso
+  desde menu vs cuál merece atajo de teclado.
+- La lista mezcla roles. Una intención del rol "soporte interno"
+  mezclada con intenciones del rol "operadora" produce análisis sucio.
+- Las intenciones se solapan sin diferenciación de trigger. Dos
+  intenciones que terminan en la misma pantalla pero arrancan de
+  triggers distintos son **dos** intenciones, no una.
+
+**Pregunta forzada al humano cuando esta pieza está vacía:** ver
+Paso 3 abajo.
+
+**Cómo lo usan las lentes:**
+
+- **F1 modo medido (EXPLORADOR)** declara qué intención está caminando
+  al entrar a cada pantalla. Clicks, K/N por pantalla, vocabulario
+  detectado y hesitación se taggean con la intención activa. Sin
+  intención declarada, F1 no arranca — caería en "mido contra qué".
+- **JUEZ** evalúa coherencia CTA→destino contra la intención que
+  disparó el CTA, no contra "la pantalla en abstracto". Y audita
+  navegación per-intención: *¿toda intención tiene puerta visible desde
+  donde su trigger la dispara, o requiere conocimiento privilegiado
+  (URL directa, atajo de teclado, recordar dónde quedaba)?*
+- **Sustracción** evalúa Test 1 por intención: compleción del JTBD por
+  intención específica, no compleción global. Un elemento que no
+  soporta NINGUNA intención declarada es SUBTRACT. Un elemento que
+  soporta UNA intención pero está visible mientras OTRA intención está
+  activa es RE-RUTEAR.
+- **Inversión** (cuando exista como lente formal) se aplica por
+  intención: *"diseñá el peor flujo posible para CADA intención mapeada
+  y mostrá en qué se parece al flujo actual"*.
+
 ## Método de trabajo
 
 ### Paso 1 — Auditoría silenciosa
@@ -255,6 +343,26 @@ falsos gaps masivos: el skill marca como roto todo lo que la próxima
 fase va a construir, ignorando que es scope-out deliberado de la fase
 actual.
 
+**Pregunta forzada de intent map si Pieza 11 está vacía** (ver §11 arriba):
+- *"Pensá en un mes típico de la persona del Pieza 3 (no del founder,
+  no del equipo — la persona declarada). Listame las distintas razones
+  por las que abre el producto. No 'qué hace adentro' — sino qué la
+  trajo a abrirlo HOY. Empezá por lo más frecuente y bajá hacia lo más
+  raro. Probablemente sean entre 4 y 7 intenciones distintas. Si dudás
+  entre 2 razones que parecen iguales, son distintas si el trigger es
+  distinto — ej: 'reviso si pasó algo' es distinto a 'agrego un caso
+  nuevo' aunque las dos terminen en la home. Por cada una decime:
+  trigger (qué pasó afuera del producto que la trajo), outcome
+  mundo-real (qué cambia afuera cuando termina), frecuencia, y qué UI
+  debería dominar la pantalla cuando esa intención está activa."*
+
+Esta pregunta es crítica. Sin intent map, F1 no puede medir K/N por
+tarea (no hay tarea declarada), el JUEZ no puede auditar coherencia
+CTA→destino (no sabe qué intención disparó el CTA), y Sustracción evalúa
+elementos contra "el JTBD" en abstracto en vez de contra cada intención
+específica — perdiendo los RE-RUTEAR genuinos (elementos que sirven a
+una intención pero están visibles mientras otra intención está activa).
+
 ### Paso 4 — Patchear, no reescribir
 
 - Usá `Edit` para parchear secciones específicas. NO reescribas el BRIEF
@@ -291,6 +399,10 @@ Escribí `docs/qa/resultados/brief-doctor-{FECHA-HOY}.md`:
 - BRIEF.APP_URL/entornos: ...
 - BRIEF.Fuentes de verdad: ...
 - Coherencia cruzada: ...
+- BRIEF.Fronteras explícitas: ...
+- BRIEF.Fase del MVP: ...
+- BRIEF.Roles: ...
+- BRIEF.Intent Map: ...
 
 ## Defectos detectados
 1. ...

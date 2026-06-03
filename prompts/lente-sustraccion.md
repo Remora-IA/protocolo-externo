@@ -98,21 +98,42 @@ Si encontrás ≥1 indicador → multi-rol no declarado es altamente probable
 Si hay multi-rol declarado → cada elemento se evalúa contra **cada rol**.
 La recomendación final depende de para cuántos roles falla los tests.
 
-### Test 1 — JTBD-compleción (per-rol)
-> "Si este elemento no existiera, ¿el JTBD de **cada rol** se completa
-> igual?"
+### Test 1 — JTBD-compleción (per-intención, no solo per-rol)
 
-Para cada rol declarado:
-- **Sí, se completa igual** → candidato para ese rol. Anotar.
-- **No, sin esto el job se rompe** → el elemento es funcional para ese
-  rol, pasa al Test 2 para ese rol.
+> "Si este elemento no existiera, ¿alguna **intención** del Intent Map
+> (BRIEF Pieza 11) deja de completarse?"
 
-Veredicto agregado:
-- Falla Test 1 para TODOS los roles → SUBTRACT candidate.
-- Falla Test 1 para algunos roles, pasa para otros → **RE-RUTEAR**
-  candidate (el elemento sirve, pero al rol equivocado en el contexto
-  actual).
-- Pasa Test 1 para TODOS los roles → seguí al Test 2.
+Pieza 11 declara N intenciones (I1, I2, ..., IN), cada una atada a un
+rol. El test corre **por intención**, no agregando todas las del mismo
+rol. Esto es lo que habilita los RE-RUTEAR genuinos: un elemento puede
+servir a I7 (alta puntual) y al mismo tiempo ser ruido para I3 (revisión
+diaria) — la solución no es borrar, es separar.
+
+Para cada intención declarada del Intent Map:
+- **Sí, la intención se completa igual sin el elemento** → candidato
+  para esa intención. Anotar.
+- **No, sin esto la intención no se cumple** → el elemento es funcional
+  para esa intención. Pasa al Test 2 para ese caso.
+
+**Caso especial — coexistencia desigual:** si el elemento sirve a la
+intención A pero está visible mientras la intención B está activa, y
+no contribuye a B, el veredicto NO es "conservar" ni "borrar" — es
+**RE-RUTEAR** (segmentar por intención: mostrar solo cuando A está
+activa, ocultar cuando B está activa). Caso típico: "Agregar deudor"
+arriba a la derecha durante I2 (subida masiva primera vez) — sirve a
+I7 (alta puntual mid-mes) pero pelea por atención visual con I2 en su
+peor momento.
+
+Veredicto agregado del Test 1:
+- Falla Test 1 para TODAS las intenciones → **SUBTRACT candidate fuerte**.
+- Falla Test 1 para algunas, pasa para otras → **RE-RUTEAR candidate**
+  (segmentación por intención activa).
+- Pasa Test 1 para TODAS las intenciones → seguí al Test 2.
+
+**Sin Intent Map declarado** (Pieza 11 vacía) → no podés correr Test 1
+como está descrito. Devolvé al orquestador a poblar Pieza 11 antes de
+seguir. La versión vieja del test (per-rol agregado) producía falsos
+SUBTRACT cuando el rol tenía intenciones internamente conflictivas.
 
 ### Test 2 — Axiom-soporte (per-rol)
 > "¿Qué axioma del mapa de Discovery demanda la existencia de este
