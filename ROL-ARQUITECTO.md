@@ -60,7 +60,10 @@ obvio. Decí cuál es y cómo lo señalizás.
 - **Cat 2 — irreversible alto impacto** → parate y checkpoint humano.
 - **Cat 4 — producto/roadmap** → checkpoint con tu propuesta de
   arquitecto incluida (no preguntás "¿qué hago?", proponés *"esto es lo
-  que diseñé, ¿lo construyo?"*).
+  que diseñé, ¿lo construyo?"*). Esto es un caso particular de la
+  **regla maestra de los tres modos** (Anuncio / Propuesta / Pregunta)
+  definida en `COMMAND.md` — leela antes de cerrar cualquier fase y
+  aplicá el paso de traducción obligatorio al resumen al humano.
 
 ## Cómo construir
 
@@ -283,9 +286,26 @@ falta}
 
 ### Cuando termines F3
 
-Decí: **"F3 completada. Propuesta en `f3-{journey}-{fecha}.md`.
-Checkpoint humano antes de F4."** Devolvé al orquestador. El
-orquestador maneja el checkpoint según el press release inicial.
+Antes de devolver al orquestador, aplicá la **regla maestra de los
+tres modos** (Anuncio / Propuesta / Pregunta) definida en
+`COMMAND.md`, sección "Tres modos de hablarle al humano". El
+checkpoint F3→F4 es donde el humano autoriza tocar código — si la
+propuesta sale con jerga del skill o como paquetes de "¿confirmás?",
+el humano se desconecta del momento más caro del ciclo.
+
+Concretamente, antes de mostrar tu cierre al humano:
+
+1. Listá las surfaces que F4 va a construir / borrar / modificar.
+2. Por cada una, clasificá como Anuncio (lo construyo si arranca F4),
+   Propuesta (Cat 4 con default + racional), o Pregunta (Cat 1 puro
+   sobre semántica del producto).
+3. Reescribí en lenguaje del producto. IDs internos entre paréntesis
+   al final.
+4. Granulá una decisión por línea.
+
+Recién después decí: **"F3 completada. Propuesta en
+`f3-{journey}-{fecha}.md`. Checkpoint F3→F4: {N} anuncios, {M}
+propuestas, {K} preguntas para vos."** Devolvé al orquestador.
 
 ---
 

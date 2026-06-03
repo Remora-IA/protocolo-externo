@@ -41,6 +41,47 @@ sea visible.
 de preguntar nada. El skill ahora opera por fases (ver `FASES.md`) y
 la entrada NO es siempre F1 — depende del estado en disco.
 
+### 0.0 — Cargar la memoria activa del founder (reglas vinculantes)
+
+El founder escribe feedback acumulativo en `MEMORY.md` del proyecto
+activo de Claude Code. Esa memoria es **vinculante** para todos los
+roles del skill: regla escrita en el manual del skill < regla escrita
+en la memoria del founder. Si choca, gana la memoria.
+
+Cómo cargarla:
+
+1. Derivá el path: tomá el cwd actual (`pwd`), reemplazá `/` por `-`,
+   y armá `~/.claude/projects/<slug>/memory/MEMORY.md`. Ejemplo:
+   `/Users/foo/proj-bar` → `~/.claude/projects/-Users-foo-proj-bar/memory/MEMORY.md`.
+2. Si el archivo existe, leelo entero. Leé también los archivos
+   `feedback-*.md` que indexa (típicamente en el mismo directorio).
+3. Si no existe, seguí sin él (proyecto sin memoria todavía).
+
+Reglas de aplicación:
+
+- **Las memorias son reglas activas, no documentación.** Si una
+  memoria dice "no preguntés cuando podés decidir" y un manual de rol
+  dice "preguntá X", gana la memoria — defaulteá con racional y seguí.
+- **Las memorias se aplican a TODOS los roles**, no solo al
+  orquestador. Cuando cargás un ROL-*.md, anunciá al rol qué memorias
+  aplican como restricción adicional.
+- **Si una memoria contradice un gate del skill** (ej. K/N obligatoria
+  en F1, multi-rol no es escudo en F2), levantá la tensión al humano
+  como Propuesta con tu mejor default + racional, NO ejecutes la
+  contradicción silenciosa.
+- **Las memorias son source of truth para "feedback acumulado del
+  founder"** — específicamente notas como:
+  - `feedback-no-preguntar.md` → default es Anuncio/Propuesta, no Pregunta
+  - `feedback-default-con-racional.md` → toda Cat 4 trae racional explícito
+  - `feedback-autonomia-4-categorias.md` → Cat 3 reversible se auto-ejecuta
+  - `feedback-skill-propone-no-decide.md` → en temas de producto, proponer estructura, no decidir
+  - `feedback-context-doctor-universal.md` → auditar contexto dinámico antes de "ask humano"
+  - `feedback-fase-mvp.md` → evaluar contra la fase del MVP, no el producto eventual
+  - (y cualquier otra que aparezca en `MEMORY.md`)
+
+Anunciá al humano al inicio de la corrida: *"Cargué N memorias
+activas: {lista de slugs}. Aplico como reglas vinculantes."*
+
 ### 0.1 — Leer FASES.md
 
 Leelo entero. Es el contrato de las 5 fases (F1 QA medido, F2 crítica
@@ -66,39 +107,60 @@ corre":
 Si hay ambigüedad (varios candidatos), elegí la fase MÁS TEMPRANA. El
 humano puede forzar otra en el press release.
 
-### 0.3 — Generar el press release de esta corrida
+### 0.3 — Anunciar el press release y clasificar las variables
 
-Mostralo al humano LITERAL, con valores concretos:
+Antes de mostrar nada, clasificá cada variable de la corrida en uno de
+tres modos (ver "Tres modos de hablarle al humano" en la sección
+"Reglas duras del orquestador" más abajo):
+
+- **Anuncio** — variable auto-derivable del disco con racional claro
+  (ej. "este journey es el único `pending`, lo corro"; "esta fase
+  toca según FASES.md sección 'Cómo el orquestador decide'"). El humano
+  puede mirar y opinar; sin opinión, arrancás.
+- **Propuesta** — Cat 3/4 con default + racional ("voy a defaultear X
+  porque Y"). El humano puede objetar; sin objeción, arrancás con el
+  default.
+- **Pregunta** — Cat 1 puro: info que SOLO el humano sabe (semántica
+  del producto, paths privados, credenciales, decisión de roadmap sin
+  racional derivable). El humano DEBE responder antes de arrancar.
+
+Mostrá al humano UN SOLO bloque con la estructura siguiente, en
+lenguaje del producto. Cero IDs internos del skill en el cuerpo del
+bloque (`F[N]`, `K/N`, `SUB#`, `Ax#`, `Pieza #` solo si el humano los
+nombró primero o entre paréntesis al final de la línea para
+trazabilidad).
 
 ```
-Esta corrida es F[N] sobre el journey [X].
-Pre-condition leída: [qué encontré en disco, con paths].
-Resultado esperado al cierre: producir [artefacto-N.md] con:
-  - [campo obligatorio 1 según FASES.md]
-  - [campo obligatorio 2]
-  - [campo obligatorio 3]
-Si llego, queda listo para F[N+1] = [nombre].
-Si no llego, el artefacto reporta dónde se trabó.
+Voy a {qué — frase concreta del producto, no del manual}.
 
-Sub-agents en esta corrida: cero para decisiones de UX. Permitidos
-solo para [operaciones mecánicas previstas si aplica, o "ninguno"].
+Lo que ya decidí (anuncio):
+- {variable 1} — {racional en una línea, derivado de disco/memoria}
+- {variable 2} — {racional}
 
-¿Confirmás o ajustás?
+Mi default (propuesta — objetá si no va):
+- {variable 3} — {default + racional + qué se rompe si va mal}
+
+Lo que necesito que me digas (pregunta — solo vos sabés):
+- {variable 4} — {por qué no puedo defaultearla yo}
 ```
 
-### 0.4 — Esperar confirmación
+Si NO hay variables Cat 1 detectadas, omitís la sección "necesito que
+me digas" entera y arrancás.
 
-El humano puede:
-- *Confirmar* → seguís a Paso 1.
-- *Ajustar journey* → cambiá el journey y volvé a 0.3.
-- *Forzar otra fase* → cambiá la fase y volvé a 0.3. Anotá el override
-  en el press release ("override: humano forzó F[M]").
-- *Autorizar F2→F3 sin parar* o *F3→F4 sin parar* → anotá la
-  autorización para los checkpoints.
-- *Redirigir a otro modo* → si pide `toolbox` o `strict`, saltá al
-  apéndice correspondiente.
+### 0.4 — Ventana de objeción y arranque
 
-15 segundos sin objeción = confirmación. NO arranques sin que pasen.
+- Si hay sección "necesito que me digas" → esperás esa respuesta. SIN
+  respuesta no arrancás. (Caso Cat 1 puro.)
+- Si NO hay Cat 1 → ventana de 15 segundos de objeción asíncrona.
+  Pasados 15s sin objeción del humano, **arrancás Paso 1**. NO repitas
+  "¿Confirmás?" — el anuncio + la ventana ES la observabilidad.
+- Si el humano objeta cualquier variable durante la ventana → reclasificás
+  esa variable como Pregunta, esperás respuesta de ESA variable, las
+  demás siguen como decididas.
+- Si el humano dice "decidí vos" → todas las Cat 1 se reclasifican
+  como Propuesta con tu mejor default + racional, anotás los defaults
+  en `docs/qa/motor/pendientes-humano.md` para revisión asíncrona, y
+  arrancás. No volvés a preguntar.
 
 ### 0.5 — Sin journeys declarados en motor.yaml
 
@@ -260,6 +322,12 @@ Asegurate que `paladin-qa` esté conectado. Si no, parate y reportá
 Leé `~/.claude/qa-ux/ROL-EXPLORADOR.md`. Anunciá: **"Entro a modo
 EXPLORADOR."** Seguí el manual del archivo.
 
+**Recordatorio cuando entrás al rol:** las memorias activas cargadas
+en Paso 0.0 siguen siendo vinculantes para el EXPLORADOR. Si el
+manual del rol y una memoria chocan, gana la memoria. La regla
+maestra de los tres modos (Anuncio / Propuesta / Pregunta) aplica al
+EXPLORADOR cuando devuelve gaps al motor o al humano.
+
 Caminá hasta que pase uno de estos tres:
 - Encontraste un gap → Paso 4 (ARQUITECTO).
 - Creés haber llegado al final → Paso 5 (JUEZ).
@@ -269,6 +337,10 @@ Caminá hasta que pase uno de estos tres:
 
 Leé `~/.claude/qa-ux/ROL-ARQUITECTO.md`. Anunciá: **"Cambio a modo
 ARQUITECTO UX/UI."** Seguí el manual.
+
+**Recordatorio:** las memorias activas (Paso 0.0) son vinculantes
+para el ARQUITECTO también. La regla maestra de los tres modos aplica
+en los checkpoints F3→F4 y en cualquier resumen al humano.
 
 Cuando el ARQUITECTO termine de construir, anunciá: **"Vuelvo a modo
 EXPLORADOR."** Volvé al Paso 3 sobre la pantalla del bloqueo, caminando
@@ -280,6 +352,11 @@ solo.
 OBLIGATORIO. No declares "llegué al final" inline. Leé
 `~/.claude/qa-ux/ROL-JUEZ.md`. Anunciá: **"Cambio a modo JUEZ
 ESTRATÉGICO."** Seguí el manual.
+
+**Recordatorio:** las memorias activas (Paso 0.0) son vinculantes
+para el JUEZ. La regla maestra de los tres modos aplica al cierre F2
+y al veredicto final — el JUEZ es históricamente el rol que más
+agotaba al humano con checkpoints en jerga.
 
 Veredicto del JUEZ:
 - **FINAL REAL** → Paso 6 (reporte de cierre).
@@ -359,6 +436,60 @@ autorización explícita en el press release.
 - O aparece Cat 2/4 → checkpoint.
 - O fuera de blast sin RECURSOS para resolverlo → checkpoint.
 - O contexto al ~80% → Paso 7 (handoff).
+
+## Tres modos de hablarle al humano (regla maestra)
+
+El skill confunde con frecuencia tres cosas que son distintas. Esta
+regla es **vinculante para los tres roles** (EXPLORADOR, ARQUITECTO,
+JUEZ) y para el orquestador. Aplica en cada momento donde el skill
+escribe algo que el humano va a leer (press release, cierre de fase,
+checkpoint F2→F3, F3→F4, resumen al humano).
+
+### Los tres modos
+
+| Modo | Cuándo | Forma textual | Espera respuesta? |
+|------|--------|---------------|-------------------|
+| **Anuncio** | Decisión auto-derivable del disco / memoria / contexto con racional claro. Cat 3 reversible con evidencia, o fase única `pending`, etc. | "Voy a {X}. Racional: {Y}." | No. Ventana de objeción 15s y arranca. |
+| **Propuesta** | Cat 3 / Cat 4 con default razonable + racional derivado de WHY/axiomas/memoria. | "Mi default es {X}. Racional: {Y}. Si querés otra cosa, decí cuál." | No. Ventana de objeción 15s y arranca con el default. |
+| **Pregunta** | Cat 1 PURO: info que solo el humano sabe (semántica del producto, decisión de roadmap sin racional derivable). | "Solo vos sabés: {Z}?" | Sí. SIN respuesta no arranca. |
+
+### Cómo aplicarlo (vinculante para todos los roles)
+
+Antes de escribir cualquier mensaje al humano, clasificá cada decisión
+pendiente en uno de los tres modos. La regla del ARQUITECTO Cat 4
+("no preguntás '¿qué hago?', proponés '¿lo construyo?'") es UN CASO
+ESPECIAL de esta regla maestra — la generalización aplica a todos los
+roles, no solo al ARQUITECTO ni solo a Cat 4.
+
+**Default cuando dudás:** Propuesta, no Pregunta. Si tu Propuesta es
+mala, el humano la objeta en 15s y la convierte en Pregunta. Si tu
+Pregunta es innecesaria, el humano se cansa de responderla y se
+desconecta de la observabilidad — costo invisible y acumulativo.
+
+### Paso de traducción obligatorio antes de devolver al humano
+
+Cualquier rol (EXPLORADOR / ARQUITECTO / JUEZ) que cierre una fase y
+produzca un resumen al humano DEBE pasar por este filtro antes de
+mostrar el mensaje:
+
+1. **¿El mensaje tiene IDs internos del skill** (`SUB#`, `K/N`, `P#`,
+   `Ax#`, `Pieza #`, `I#`, `B#`, `G##`, `F#`, etc.)? Si sí, reescribilo
+   en lenguaje del producto y del operador. Los IDs van entre paréntesis
+   al final de la línea para trazabilidad, NO en el cuerpo de la frase.
+2. **¿El mensaje pregunta cosas que podés defaultear?** Si sí,
+   reformulalas como Propuesta con default + racional. Solo dejá como
+   Pregunta lo que es Cat 1 puro.
+3. **¿El mensaje empaqueta varias decisiones en una sola pregunta**
+   (ej. "toast + undo + Mi backlog + sin confirm dialog. ¿Vale?")? Si
+   sí, granular: una decisión = una línea = una clasificación
+   (Anuncio / Propuesta / Pregunta).
+4. **¿El racional usa el lenguaje del manual del skill** (axiomas por
+   ID, lentes por nombre, fases por número)? Si sí, traducí al
+   lenguaje del producto. *"Viola Ax2"* → *"el primer contacto
+   WhatsApp falla sin esto"*.
+
+Sin este filtro aplicado, el cierre del rol queda `in_progress` —
+NO `completed`. El orquestador chequea en Paso 6.
 
 ## Reglas duras del orquestador
 

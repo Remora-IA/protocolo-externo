@@ -384,9 +384,49 @@ NO `completed`. El orquestador chequea la rúbrica en Paso 6.
 
 ### Cuando termines F2
 
-Decí: **"F2 completada. Lista de derribo en `f2-{journey}-{fecha}.md`.
-Checkpoint humano antes de F3."** Devolvé al orquestador. El
-orquestador maneja el checkpoint según el press release inicial.
+Antes de devolver al orquestador, aplicá la **regla maestra de los
+tres modos** (Anuncio / Propuesta / Pregunta) definida en
+`COMMAND.md`, sección "Tres modos de hablarle al humano". Esto NO es
+opcional: el resumen al humano de F2 históricamente sale con IDs
+internos (SUB1, P1, K/N, Ax3, Pieza 9, I3/I8) y como paquetes de
+preguntas binarias agotantes. El paso de traducción obligatorio fixea
+eso.
+
+Concretamente, antes de mostrar tu cierre al humano:
+
+1. Listá las decisiones pendientes para el checkpoint F2→F3.
+2. Por cada una, clasificá como **Anuncio** (auto-derivable, Cat 3
+   reversible con evidencia), **Propuesta** (Cat 3/4 con default +
+   racional desde axiomas/WHY/memoria), o **Pregunta** (Cat 1 puro:
+   semántica del producto que solo el founder sabe).
+3. Reescribí cada decisión en lenguaje del producto y del operador.
+   IDs internos del skill van entre paréntesis al final de la línea
+   para trazabilidad, no en el cuerpo de la frase.
+4. Granulá: una decisión = una línea = una clasificación. Nunca
+   empaqueta varias decisiones en una sola pregunta "¿vale?" / "¿OK?".
+
+**Ejemplo de antes / después** (extraído del cierre F2 que históricamente
+agotaba al founder):
+
+Antes:
+> *"Patrón P1 default razonable: toast efímero con undo de 5s +
+> sección 'Mi backlog' con casos aprobados/asignados pendientes. NO
+> confirm dialog. ¿Vale?"*
+
+Después (granulado + traducido + clasificado):
+> *"Mi default (objetá si no va): cuando la operadora aprueba una
+> sugerencia de Carolina, en vez de que el caso desaparezca sin
+> feedback, mostrar un mensaje 'aprobado — deshacer (5s)' + agregar
+> una página 'Mi backlog' donde la operadora ve qué aprobó y sigue
+> abierto. Sin pop-up de confirmación. Racional: si no, la operadora
+> pierde control sobre lo que ya aprobó. (Trazabilidad: F2 patrón P1
+> ejecuta-y-olvida.)"*
+
+Recién después de aplicar el paso de traducción, decí: **"F2
+completada. Lista de derribo en `f2-{journey}-{fecha}.md`. Checkpoint
+F2→F3: {N} anuncios, {M} propuestas, {K} preguntas para vos."** Devolvé
+al orquestador. El orquestador maneja el checkpoint según el press
+release inicial.
 
 ---
 

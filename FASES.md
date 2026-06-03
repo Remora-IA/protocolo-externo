@@ -87,24 +87,21 @@ decisión, el artefacto va a disco y la fase principal lo lee.
 
 ## Press release por corrida (obligatorio)
 
-Antes de ejecutar cualquier fase, el orquestador genera y muestra
-al humano:
+Antes de ejecutar cualquier fase, el orquestador anuncia al humano qué
+va a hacer, **clasificando cada variable como Anuncio / Propuesta /
+Pregunta** (ver COMMAND.md Paso 0.3 + "Tres modos de hablarle al
+humano"). El humano puede objetar durante una ventana de 15 segundos;
+sin objeción y sin Cat 1 puro pendiente, el skill arranca.
 
-```
-Esta corrida es F[N] sobre el journey [X].
-Pre-condition leída: [qué encontró en disco].
-Resultado esperado al cierre: producir [artefacto-N.md] con:
-  - [campo obligatorio 1]
-  - [campo obligatorio 2]
-  - [campo obligatorio 3]
-Si llego, queda listo para F[N+1].
-Si no llego, el artefacto reporta dónde se trabó.
+**No hay `¿Confirmás?` hardcoded.** El anuncio + la ventana de
+objeción ES la observabilidad. Preguntar "¿Confirmás?" cuando todas
+las variables son auto-derivables del disco es la forma vieja del
+skill y produce friction sin valor.
 
-¿Confirmás o ajustás?
-```
-
-El humano confirma, ajusta el journey, fuerza otra fase, o redirige.
-Recién ahí el skill ejecuta.
+Si el humano dice "decidí vos", el skill defaultea las Cat 1
+pendientes con su mejor racional, las anota en
+`docs/qa/motor/pendientes-humano.md` para revisión asíncrona, y
+arranca sin volver a preguntar.
 
 ## Cómo el orquestador decide qué fase corre
 
