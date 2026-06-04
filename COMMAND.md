@@ -147,6 +147,42 @@ Lo que necesito que me digas (pregunta — solo vos sabés):
 Si NO hay variables Cat 1 detectadas, omitís la sección "necesito que
 me digas" entera y arrancás.
 
+### 0.3.bis — Si la fase entrante es F1, nombrar las métricas
+
+Cuando la fase entrante es **F1**, el press release DEBE incluir un
+bloque adicional que nombre lo que se va a medir. Sin esto, F1 corre
+"midiendo lo que salga" y la sesión produce narrativa con métricas
+parciales — exactamente el modo de falla que el gate de cierre F1
+existe para bloquear (ver ROL-EXPLORADOR.md "Gate de cierre F1").
+
+Agregá al press release este bloque, en lenguaje del producto:
+
+```
+Esta corrida es F1 medido sobre {journey-slug}.
+Intención activa: I{N} — "{nombre corto del Intent Map}".
+Métricas que voy a producir por pantalla:
+  1. Clicks-hasta-acción-útil (número)
+  2. K/N — cuántos elementos de la pantalla sirven a la intención (K)
+     sobre el total visible (N).
+  3. Coherencia CTA→destino — sí/no/parcial.
+  4. Vocabulario-interno — palabras del producto que un usuario nuevo
+     no esperaría.
+  5. Prominencia visual por intención — peso visual de los K vs los
+     N-K, veredicto "K domina | K pierde | empata".
+  6. Sub-flujos completados vs intentados, dead-ends, hesitación.
+Si alguna de estas no se puede calcular en una pantalla, la sesión lo
+anuncia y queda como deuda del gate.
+```
+
+Esto le da al humano la imagen de **qué se mide antes de medir**. Si
+ve "Intención activa I3 — revisión diaria" y el journey real era
+setup-primera-vez, objeta en la ventana de 15 segundos. Sin este
+bloque, la objeción aparece recién al ver el reporte producido, cuando
+la corrida ya gastó tiempo midiendo lo equivocado.
+
+Si la fase entrante es F2/F3/F4/F5, este bloque NO aplica — cada
+fase nombra sus propias post-conditions en su rol.
+
 ### 0.4 — Ventana de objeción y arranque
 
 - Si hay sección "necesito que me digas" → esperás esa respuesta. SIN
@@ -184,6 +220,56 @@ journeys:
 
 Default journey activo: el primero en `pending`. El humano puede
 overridear en el press release.
+
+### 0.6 — Pre-flight duro de Pieza 11 (solo si la fase entrante es F1)
+
+Antes de arrancar Paso 1, si la fase entrante detectada en 0.2 es
+**F1**, chequeá que el BRIEF del proyecto tiene Pieza 11 (Intent Map)
+poblada para el journey activo. ROL-EXPLORADOR.md lo exige
+literalmente: *"Si el BRIEF no tiene Pieza 11 poblada → devolvé al
+orquestador con 'falta Intent Map, no arranco F1'. F1 sin intención
+declarada NO corre — caería en 'mido contra qué'."* Hoy ese chequeo no
+se enforce desde el orquestador, así que F1 arranca y mide sin
+intención.
+
+Protocolo del pre-flight:
+
+1. Buscá el BRIEF del proyecto. Path típico: `docs/qa/BRIEF.md`. Si no
+   existe, F1 no arranca — disparás Brief Doctor entero antes de
+   seguir.
+2. Si el BRIEF existe, buscá la sección "Pieza 11 — Mapa de
+   intenciones del usuario". Tiene que listar al menos una intención
+   con: Trigger, Outcome mundo-real, Rol, Frecuencia.
+3. Buscá una intención del Intent Map que mapee al journey activo. Si
+   `setup-primera-vez` es el journey, una intención debería ser
+   algo como I1="Cargar primer deudor" o I2="Configurar canal
+   WhatsApp por primera vez". Si el journey no mapea a ninguna
+   intención, eso ES el gap — F1 no puede correr porque no hay
+   intención que medir.
+4. Resultado del pre-flight:
+   - **Pieza 11 ausente o vacía** → anunciá al humano: *"F1 no
+     arranca: BRIEF Pieza 11 no existe / está vacía. Disparo Brief
+     Doctor para poblarla. ¿Arranco Brief Doctor o querés escribir el
+     Intent Map vos antes?"*. Esperás respuesta. Sin Pieza 11, F1 no
+     corre.
+   - **Pieza 11 existe pero no cubre el journey activo** → anunciá:
+     *"F1 no arranca: Intent Map existe pero ninguna intención mapea
+     a {journey-slug}. Necesito agregar I{N} con Trigger + Outcome
+     antes de medir. ¿Arranco Brief Doctor para esa pieza?"*. Esperás
+     respuesta.
+   - **Pieza 11 cubre el journey** → seguís a Paso 1. Anotá la
+     intención activa I{N} que vas a meter en el bloque 0.3.bis del
+     press release.
+
+Si el humano dice "decidí vos" frente a este pre-flight, defaulteás a
+"arrancá Brief Doctor para Pieza 11" — no hay racional para arrancar
+F1 sin Intent Map.
+
+Esto reemplaza el comportamiento histórico donde F1 arrancaba sin
+Intent Map y producía métricas sin destinatario claro. Sin Intent
+Map, K/N no tiene denominador semántico (¿K respecto a qué?), y la
+métrica de prominencia visual no tiene veredicto posible (¿K respecto
+a cuál intención?).
 
 ## Paso 1 — Cargar la config del motor (o crearla la primera vez)
 
@@ -380,16 +466,81 @@ Complexity en globalidad" cuando aplica (F2, F3, F5).
 ### Gate de post-condition (chequeo duro antes de declarar `completed`)
 
 Antes de anunciar la fase como completada y actualizar `motor.yaml`,
-abrí el ROL-{X}.md de la fase y aplicá literal su "Gate de cierre F{N}"
-(si existe). Si falta cualquiera de los criterios del gate, NO declares
-`completed`:
+**materializá el gate como artefacto en disco** y leélo vos mismo
+antes de mover nada. Sin artefacto físico, el chequeo se evapora —
+ese es el modo de falla histórico donde la sesión "ya sabe que cumplió"
+y avanza sin verificar.
 
-- Estado del artefacto = `in_progress`.
-- Anunciá al humano: *"F{N} no cumple gate de cierre — falta {criterio}.
-  Vuelvo a {rol} para completar. NO avanzo a F{N+1}."*
-- `motor.yaml.journeys[].estado` NO sube de nivel.
-- Si el rol no puede completar el gate en esta sesión (ej. ya pasó el
-  80% de contexto), disparás handoff (Paso 7) con la deuda explícita.
+**Protocolo del gate (obligatorio, en este orden):**
+
+1. Abrí el ROL-{X}.md de la fase y leé literal su sección "Gate de
+   cierre F{N}" (si existe). Cada criterio del gate es un item.
+2. Escribí `docs/qa/motor/gate-f{N}-{journey-slug}-{YYYY-MM-DD}.md`
+   con un checkbox por criterio, en este formato literal:
+
+   ```markdown
+   # Gate F{N} — {journey-slug} — {YYYY-MM-DD}
+
+   Artefacto evaluado: docs/qa/resultados/f{N}-{journey-slug}-{YYYY-MM-DD}.md
+   Rol responsable: {EXPLORADOR | ARQUITECTO | JUEZ}
+
+   ## Criterios del gate (literal de ROL-{X}.md)
+
+   - [x] {Criterio 1 — copiado literal del rol}
+         Evidencia: {línea/sección del artefacto donde aparece, o
+         dato concreto. Ej: "Pantalla 1 K/N = 3/14, Pantalla 2 K/N = 2/9"}
+   - [ ] {Criterio 2 — copiado literal del rol}
+         Evidencia: FALTA — {qué falta concretamente y por qué}
+   - [x] {Criterio 3}
+         Evidencia: ...
+
+   ## Veredicto
+
+   - Total criterios: N
+   - Cumplidos: M
+   - Faltantes: N - M
+   - Veredicto: PASA | NO PASA
+
+   ## Si NO PASA
+
+   - Fase queda: in_progress
+   - motor.yaml.journeys[].estado: SIN CAMBIO
+   - Próxima acción: volver al rol {X} para completar {lista de
+     criterios faltantes}, O disparar handoff si el contexto ya está
+     >70%.
+   ```
+
+3. Releé el archivo que acabás de escribir. Contá los `[x]` y los
+   `[ ]`. Si hay AL MENOS UN `[ ]`, el veredicto es **NO PASA**, sin
+   excepciones. No hay "casi cumple", no hay "el resto está bien".
+4. Si el veredicto es **NO PASA**:
+   - Estado del artefacto principal = `in_progress`.
+   - Anunciá al humano: *"F{N} no cumple gate de cierre — faltan
+     {lista de criterios con `[ ]`}. Artefacto del gate:
+     docs/qa/motor/gate-f{N}-{journey-slug}-{fecha}.md. Vuelvo a
+     {rol} para completar. NO avanzo a F{N+1}."*
+   - `motor.yaml.journeys[].estado` NO sube de nivel.
+   - Si el rol no puede completar el gate en esta sesión (ej. ya pasó
+     el 70% de contexto), disparás handoff (Paso 7) con la deuda
+     explícita: el handoff incluye el path del gate y la lista de
+     `[ ]`.
+5. Si el veredicto es **PASA**:
+   - Anunciás la fase completada (formato del bloque de abajo).
+   - Actualizás `motor.yaml.journeys[].estado` al nuevo nivel.
+
+**Regla dura — el gate NO se auto-aprueba.** Aunque la sesión "esté
+segura" de que cumplió, el artefacto se escribe igual. La razón: si
+no hay archivo en disco con el checkbox marcado, la próxima sesión
+(o el humano leyendo asincrónicamente) no tiene cómo verificar que el
+chequeo se hizo. El artefacto ES el chequeo, no su documentación.
+
+**Regla dura — el gate NO se firma con `[x]` sin evidencia concreta
+en el artefacto principal.** Marcar `[x]` sobre criterios sin
+ubicar línea/sección/dato concreto en el f{N}-*.md es exactamente el
+modo de falla que estamos cortando. Si el criterio dice "K/N
+numérica por cada pantalla" y el artefacto no tiene tablas K/N por
+pantalla, el checkbox es `[ ]`, sin importar cuán narrativamente esté
+descrita la pantalla.
 
 Esto reemplaza el viejo comportamiento de "el rol cierra y el
 orquestador confía". El orquestador es el gate-keeper de las
