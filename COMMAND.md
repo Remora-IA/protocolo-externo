@@ -763,6 +763,7 @@ existían pero ningún rol los nombraba).
 | Auditoría | JUEZ | `prompts/lente-fasing.md` | Evaluar contra la fase del MVP, no contra el producto eventual |
 | Auditoría | JUEZ | `prompts/lente-simulacion-persona.md` | Desafiar findings desde una persona específica con stakes reales |
 | Auditoría | JUEZ (F2) | `prompts/lente-inversion.md` | Sustracción dio ≤2 candidatos pero F1 reportó síntomas (densidad baja, hesitación, dead-ends); diseñar el antiproducto por intención y comparar |
+| Auditoría | JUEZ (F5) + EXPLORADOR (verificación) | `prompts/lente-integracion-real.md` | **Obligatoria si el journey toca persistencia/motor/comunicación.** Aplicá rúbrica R1-R8 (walk técnico, persistencia backend verificada por delta GET, motor activado, counts UI=backend, error handling, copy sin promesas vacías, memorias respetadas, Cat 3 reversibilidad). Por cada path del journey, no solo el principal. Sin esto, F5 puede tildar "FINAL REAL" sobre UI que el operador descubre vacía en T+5 minutos. |
 | Cierre | Orquestador | `prompts/lente-C-sintesis.md` | Consolidar findings al ledger + triage Cat 1/2/3/4 |
 
 **Regla de carga:** lente solo se lee si la condición aplica. No

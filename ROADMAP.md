@@ -117,15 +117,15 @@ F4-bis cerró deudas IA-buildable, F5 v2 verificó con rúbrica nueva.
       promesas vacías, memorias respetadas, Cat 3 reversibilidad)
 - [x] Observación empírica documentada en
       `observaciones-empiricas/integracion-real-validada-2026-06-04.md`
-- [ ] Promover lente a obligatoria en gate F5 cuando journey toca
+- [x] Promover lente a obligatoria en gate F5 cuando journey toca
       persistencia (la mayoría). Editar ROL-JUEZ.md sección "Gate de
       cierre F5" para citar R1-R8 + protocolo "GET endpoints antes,
       caminar, GET endpoints después, calcular delta"
-- [ ] Editar ROL-EXPLORADOR.md modo verificación para que la rúbrica
+- [x] Editar ROL-EXPLORADOR.md modo verificación para que la rúbrica
       se aplique a CADA path del journey, no solo al principal
       (sub-gap detectado en F5 v2: M8 unitario también necesitaba
       wireup además de M4 masivo)
-- [ ] Agregar a tabla "Apéndice — lentes invocables por rol" del
+- [x] Agregar a tabla "Apéndice — lentes invocables por rol" del
       COMMAND.md el row: "Auditoría | JUEZ (F5) |
       `prompts/lente-integracion-real.md` | Journey toca
       persistence/motor/comunicación"

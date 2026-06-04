@@ -393,7 +393,21 @@ derribo) y la cadena se ablanda. Por eso este gate es hard.
    navegación de la sección 3.4): verificá una por una si ahora tienen
    puerta visible. Si alguna sigue huérfana, F5 es re-abierto para esa
    intención.
-6. **Lanzá el JUEZ** para el veredicto final (no lo declares vos
+6. **Rúbrica integración real R1-R8 — por CADA path del journey**, no
+   solo el principal. Leé `prompts/lente-integracion-real.md` y
+   aplicala. Sub-gap empíricamente detectado: en Kobra F5 v2, M4
+   tenía wireup backend pero M8 no — un solo path auditado no
+   garantiza el otro. **Protocolo:**
+   - Identificá los N paths del journey (ej. masivo I2 + unitario I7
+     + paralelo I1).
+   - Para CADA path, capturá baseline de endpoints relevantes (GET).
+   - Caminá el path.
+   - GET endpoints de nuevo, calculá delta.
+   - Si delta == 0 cuando el path debería persistir/disparar, declaralo
+     G-INT-N para ese path específico.
+   - **Sin esto, F5 v1 falsamente pasa gate sobre un path y deja otro
+     mintiendo.**
+7. **Lanzá el JUEZ** para el veredicto final (no lo declares vos
    inline — F5 también respeta la regla del JUEZ).
 
 ### Artefacto F5 — `f5-{journey}-{YYYY-MM-DD}.md`

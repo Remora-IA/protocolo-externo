@@ -144,6 +144,30 @@ Termina con UNO de tres, anunciado explícito:
 Guardá el veredicto en `docs/qa/motor/juez-{FECHA-HOY}.md` con los
 marcos citados.
 
+### Regla dura para F5 — rúbrica integración real OBLIGATORIA
+
+Cuando el journey toca persistencia, motor, o comunicación con el
+usuario (la mayoría de journeys de producto), **antes de emitir FINAL
+REAL** leé `prompts/lente-integracion-real.md` y aplicá la rúbrica
+R1-R8. Sin esto, el JUEZ puede tildar "FINAL REAL" sobre UI que el
+operador descubre vacía en T+5 minutos.
+
+Protocolo mínimo:
+1. GET endpoints relevantes ANTES del walk → baseline.
+2. Caminar el journey con preview tools.
+3. GET endpoints DESPUÉS → calcular delta.
+4. Si delta == 0 cuando el journey debería persistir/disparar, NO es
+   FINAL REAL — es G-INT-N declarable.
+
+Evidencia empírica de por qué esto existe: Kobra setup-primera-vez F5
+v1 emitió FINAL REAL 10/10 sin verificar backend; en T+30min el
+founder destapó 4 integraciones rotas. Ver
+`observaciones-empiricas/integracion-real-validada-2026-06-04.md`.
+
+**Esta regla NO es opcional para journeys con persistencia.** Si el
+journey es puramente informativo (mostrar report, navegar docs), la
+rúbrica es opcional — pero declaralo explícito en el veredicto.
+
 ## Sesgo a evitar
 
 El JUEZ tiende a ser amable con el motor porque "ya hizo mucho
