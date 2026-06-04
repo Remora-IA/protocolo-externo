@@ -35,34 +35,66 @@ Tag: `0.1.0`.
 
 ## 0.2.0 — tabula rasa (PLANNING)
 
-El skill aprende a derribar la UI desde cero sin reaccionar al objeto
-actual. Promueve el experimento v2/ del skill (M0 Intent Storming +
-ARQUITECTO destructivo) e integra con materializar.
+**Frame teórico activado:** Working Backwards from Press Release (Amazon)
++ Tabula Rasa Architect. El skill aprende a derribar la UI desde axiomas
+ignorando el objeto actual, en vez de reaccionar a F2.
 
-- [ ] Auditar v2/ vs estructura actual — qué es essential, accidental,
-      redundante con 0.1.0
-- [ ] Decidir merge plan de v2/M0 con Pieza 11 del BRIEF
+**Síntoma que cubre:** F3 hoy es "re-fundación desde axiomas" pero
+arranca como reacción al derribo de F2 — no es tabula rasa pura. Cuando
+el producto actual está lejos del WHY, F3 hereda inercia.
+
+**Cómo el founder sabrá que 0.2.0 está done:** correr F3 sobre un
+journey donde el producto actual NO debería existir (ej: WhatsApp como
+lugar primario de la dueña, no panel) y ver que F3 propone un sistema
+que ignora el panel actual sin justificarse en F2.
+
+- [ ] Auditar v2/M0 Intent Storming vs Pieza 11 del BRIEF — ¿M0 es
+      essential complexity nueva o accidental redundante? (commit
+      subject: `0.2.0: auditar M0 vs Pieza 11`)
+- [ ] Decidir merge plan: si M0 reemplaza Pieza 11, archivar v2/; si
+      M0 complementa, documentar flujo combinado
 - [ ] Promover v2/ROL-ARQUITECTO al ROL-ARQUITECTO vivo con modo
-      "destructivo" como opcional al lado de "generativo"
+      "destructivo" disponible alongside "generativo F3"
+- [ ] Sub-rutina nueva: `cuando-activar-destructivo.md` con criterios
+      (gap entre WHY y producto > umbral X)
 - [ ] Validar empíricamente sobre un journey de Kobra o SynthesGuard
-- [ ] Documentar en observaciones-empiricas/ cuándo activar modo
-      destructivo
+      donde producto actual está lejos del WHY
+- [ ] Documentar el patrón en observaciones-empiricas/
 
 ---
 
 ## 0.3.0 — frames teóricos explícitos (BACKLOG)
 
-El skill nombra explícitamente Brooks + Munger + JTBD como frames
-durante F3. Hoy los usa análogamente (Pieza 11, lente-sustracción)
-pero no por nombre — la diferencia se nota en derivaciones tibias.
+**Frames teóricos activados:** Brooks (essential/accidental complexity)
++ Munger (inversión) + JTBD por nombre, no por analogía.
 
-- [ ] Brooks essential/accidental como filtro estricto per-elemento
-- [ ] Munger inversión como método obligatorio antes de proponer
-- [ ] Consolidar duplicaciones 🟡 media:
-  - [ ] Estructura del reporte por rol (3 copias en ROL-*.md)
-  - [ ] Gate de cierre Fn (3 copias)
-  - [ ] Press release reglas (COMMAND vs FASES)
-- [ ] 13 lentes en prompts/ con árbol de decisión de invocación
+**Síntoma que cubre:** F3 hoy usa Pieza 11 + lente-sustracción
+(análogos funcionales de Brooks/Munger) pero no los nombra. En
+derivaciones tibias el rol no detecta que está infringiendo Brooks
+porque no lo tiene como filtro explícito.
+
+**Cómo el founder sabrá que 0.3.0 está done:** F3 produce reportes
+donde cada elemento propuesto está clasificado como Essential o
+Accidental por Brooks, y cada propuesta tiene un check de Munger
+("¿qué haría que esto falle al servir I{N}? — invierto para evitar").
+
+- [ ] Brooks como filtro estricto: cada elemento propuesto en F3 viene
+      con clasificación E/A + 1 línea de justificación. Sin esto, el
+      elemento no entra en la propuesta. (commit: `0.3.0: agregar
+      Brooks filter a F3`)
+- [ ] Munger como método obligatorio antes de proponer: el rol ARQUITECTO
+      lista las formas en que la UI propuesta podría fallar al servir
+      I{N}, después diseña para invertir cada modo de falla
+- [ ] Consolidar duplicaciones 🟡 detectadas en
+      observaciones-empiricas/essential-accidental-kobra-2026-06-03.md:
+  - [ ] Estructura del reporte por rol → un solo
+        `prompts/estructura-reporte-rol.md` invocado por los 3
+  - [ ] Gate de cierre Fn → patrón compartido en
+        `prompts/gate-de-cierre.md`
+  - [ ] Press release reglas: decidir si viven en COMMAND.md o
+        FASES.md (mover y cross-referenciar)
+- [ ] 13 lentes en prompts/ con árbol de decisión: cuándo invocar cada
+      una, ordenado por fase + rol que la pide
 
 ---
 
