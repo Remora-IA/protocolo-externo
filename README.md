@@ -17,6 +17,25 @@ entre rotaciones.
 | `ROL-JUEZ.md` | Auditoría + 2 modos (audit-final / derribo F2). |
 | `PALADIN-PLAYBOOK.md` | Orden eficiente de tools del MCP paladin-qa. |
 | `prompts/` | Lentes individuales (sustracción, inversión, fasing, etc.) invocables como subrutinas desde los roles. Incluye `materializar-antes-de-gate.md` — sub-rutina obligatoria al cierre de F2/F3/F5. |
+| `observaciones-empiricas/` | Análisis del propio skill descubiertos mientras se usa en proyectos reales. Cada doc documenta una observación sobre cómo opera el skill, con evidencia empírica de la corrida que lo disparó. Leer `observaciones-empiricas/README.md` para la regla simple de qué va acá. |
+
+## Taxonomía con proyectos cliente
+
+Cuando el skill se aplica a un proyecto (Kobra, Lau, etc.), hay dos
+categorías de docs producidos:
+
+- **Skill artifacts** → viven acá (`~/.claude/qa-ux/`). Son sobre cómo
+  opera el skill — reusables entre proyectos.
+- **Journey artifacts** → viven en `<proyecto>/docs/qa/`. Son sobre el
+  proyecto cliente — F1/F2/F3 reports, gates, canvas, BRIEF, etc.
+
+**Regla simple:**
+> *"¿Este doc le va a servir al skill aplicado en OTRO proyecto?"*
+> Sí → vive acá. No, solo al cliente actual → vive en el cliente.
+
+Si dudás: ¿menciona código/UX/decisiones específicas del cliente?
+- Sí → vive en el cliente.
+- No, habla del skill en abstracto → vive acá.
 
 ## Status de `v2/`
 
