@@ -624,6 +624,28 @@ mala, el humano la objeta en 15s y la convierte en Pregunta. Si tu
 Pregunta es innecesaria, el humano se cansa de responderla y se
 desconecta de la observabilidad — costo invisible y acumulativo.
 
+### Patrones que NO son Cat 1 (anti-patrones detectados empíricamente)
+
+Esta lista crece cada vez que una corrida levanta como Cat 1 algo que
+era derivable. Antes de marcar Pregunta, chequeá si tu situación
+matchea cualquiera de estos — si sí, es Propuesta con racional, no
+Pregunta.
+
+| Patrón | Por qué NO es Cat 1 | Cómo formularlo como Propuesta |
+|--------|---------------------|--------------------------------|
+| **Tensión entre acción del founder y una memoria activa** | La memoria está en disco; el racional para resolverla es derivable del journey activo, del WHY, o del propio reporte de la fase anterior. Tensión ≠ Cat 1. | *"Mi default: {X}. Racional: la memoria {Y} sigue activa pero {Z derivado de disco} la interpreta como {alcance específico}, no contradice. Objetá si lo ves distinto."* |
+| **Ergonomía de presentación al humano** (sync vs async, walkthrough vs lectura sola, orden de presentación) | Es preferencia del founder pero hay default razonable derivado del momento (sync mantiene momentum, async permite reflexión; sync es default en checkpoints activos). | *"Mi default: sync, una pantalla por turno. Si preferís async leélo solo y volvé con tu respuesta — decime cuál antes de los 15s."* |
+| **Orden de construcción cuando F4 tiene N surfaces** | F3 ya declara orden recomendado en su sección "Pre-condition que dejo para F4". Si F3 no lo declaró, derivás por: dependencias técnicas → frecuencia de intención → impacto en intención primaria. | *"Mi default de orden: {1, 2, 3} por {racional}. Objetá si querés otro."* |
+| **Mecanismo técnico de implementación** (flag vs ruta nueva, mitigación temporal, etc.) | Default canónico = el más reversible (flag > ruta > borrado). Solo subí a Cat 1 si hay trade-off semántico que el founder DEBE evaluar. | *"Mi default: flag KOBRA_X=true. Racional: más reversible que ruta dedicada; off por default en prod."* |
+| **Confirmación de proceder cuando el press release ya anunció todo** | Si el founder no objetó la fase entrante en el press release, no le pidas confirmación adicional para empezar a trabajar dentro de esa fase. | (No pidas confirmación — arrancá.) |
+| **Aprobación entera de F3 cuando hay anuncios + propuestas individuales** | Cada anuncio es Cat 3 individual; cada propuesta es Cat 4 individual. Pedir "¿apruebo entero?" empaqueta lo que la regla maestra obliga a granular. | *"Anuncios 1-7: arranco si no objetás cada uno en 15s. Propuesta 8: mi default es {X}, objetá si querés otra."* (sin pregunta de "apruebo entero") |
+
+**Regla derivada:** si tu Pregunta empieza con *"¿Apruebo...?"*, *"¿Va...?"*,
+*"¿Arranco...?"*, *"¿OK con...?"* — casi siempre es Propuesta mal
+clasificada. Reformulá. La única Pregunta válida empieza con *"Solo vos
+sabés:..."* o *"Necesito tu decisión sobre {semántica del producto que
+no tengo cómo derivar}: ..."*.
+
 ### Paso de traducción obligatorio antes de devolver al humano
 
 Cualquier rol (EXPLORADOR / ARQUITECTO / JUEZ) que cierre una fase y
