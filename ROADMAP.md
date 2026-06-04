@@ -123,6 +123,14 @@ Encodeado en SKILL-V2-SPEC.md como sección "Autonomía con evidencia
 - [ ] **Validación operador de v2** (Cap 2, 3, 5, 6 + silencio +
       tangibilización end-to-end) — pendiente próximo journey real
       que el founder decida correr
+- [ ] **Capacidad 8 — Handoff humano digerible** (detectada
+      empíricamente 2026-06-04 al final de la primera corrida).
+      Cuando el skill identifica pendiente humano, no basta nombrarlo:
+      handoff incluye preguntas literales en lenguaje del founder,
+      2-4 ejemplos de respuestas, costo de inacción, cómo se ve
+      "responder". Sin esto, pendencias-fantasma se repiten sesión
+      tras sesión sin avanzar. Encodeado en SKILL-V2-SPEC.md.
+      Validación pendiente: próxima corrida que termine con handoff
 
 ---
 

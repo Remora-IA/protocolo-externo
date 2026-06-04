@@ -500,9 +500,57 @@ artefactos no se pueden producir (ej. no hay README, no hay nada),
 el skill levanta una sola observación al founder y para. No improvisa
 artefactos.
 
+### Capacidad 8 — Handoff humano digerible
+
+Detectada empíricamente 2026-06-04 en la primera corrida de v2: el
+skill nombró correctamente las pendencias del founder ("Verificación
+de pago — Cat 1 puro, FOUNDER-INPUT #2 vacío"), pero el founder no
+las pudo accionar porque el handoff era jerga interna del skill, no
+lenguaje del founder.
+
+Cuando el skill identifica algo como **Cat 1 / pendiente humano /
+"no lo decide el skill"**, no basta con nombrarlo. El handoff
+incluye 4 elementos obligatorios:
+
+1. **Preguntas literales en lenguaje del founder.** Sin jerga interna
+   ("Cat 1", "FOUNDER-INPUT #N", "axioma X"). Las preguntas se
+   formulan como las haría una persona que entiende el negocio pero
+   no la spec del skill. Ej:
+   - ❌ "Verificación de pago — Cat 1 puro, FOUNDER-INPUT #2 vacío"
+   - ✅ "Cuando un deudor paga, ¿cómo sabe Kobra que llegó la plata?
+        ¿Carolina lo pregunta y confías? ¿Pedís foto del
+        comprobante? ¿Cruzás con extracto bancario? ¿Cada cuánto?"
+
+2. **2-4 ejemplos de respuestas posibles.** No para que el founder
+   elija una — para que vea la **forma** de la decisión y entienda
+   que es contestable. Una pregunta abierta sin ejemplos se siente
+   abstracta y flotante.
+
+3. **Qué pasa si NO se responde** — costo de inacción concreto. Ej:
+   *"Sin esto definido, Kobra no puede declarar plata cobrada con
+   confianza. La métrica del WHY (plata recuperada > 0) queda
+   bloqueada."*
+
+4. **Cómo se ve "responder"** — el artefacto concreto a producir.
+   Ej: *"Editar `docs/FOUNDER-INPUT.md` sección #2. Una página en
+   lenguaje natural alcanza."*
+
+Sin estos 4, el handoff es ceremonia — el founder lee la pendencia,
+queda flotando, no actúa, y la próxima sesión repite el mismo
+diagnóstico. Anti-patrón: **pendencia-fantasma** (se nombra repetido
+sin avanzar).
+
+#### Cuándo NO sobre-cargar el handoff
+
+Si la pendencia es trivial (ej. "una línea de greenlight"), el
+handoff puede ser más corto. La regla operativa: **el founder, leyendo
+el último párrafo del skill, debería saber exactamente qué hacer en
+los próximos 5 minutos.** Si no lo sabe, faltó algo de los 4
+elementos.
+
 ---
 
-## Cómo verificás que las 7 capacidades funcionan (test empírico)
+## Cómo verificás que las 8 capacidades funcionan (test empírico)
 
 Cuando invoques `/qa-ux-v2` sobre un repo:
 
@@ -516,6 +564,13 @@ Cuando invoques `/qa-ux-v2` sobre un repo:
    referencia? → Capacidad 5 + 6.
 5. ¿Cualquier commit propuesto pasa por `/roadmap commitear`?
    → Capacidad 3.
+6. ¿El cierre del turno termina con handoff digerible (preguntas
+   literales + ejemplos + costo de inacción + cómo se responde)?
+   → Capacidad 8.
 
-Si las 5 verificaciones fallan, el skill v2 está corriendo en modo
+Si las 6 verificaciones fallan, el skill v2 está corriendo en modo
 v1 disfrazado. Reportar al founder.
+
+**Test específico de Capacidad 8:** después de leer el último párrafo
+del skill, el founder debería saber exactamente qué hacer en los
+próximos 5 minutos. Si no lo sabe, Capacidad 8 falló.
