@@ -49,13 +49,53 @@ Solo dos casos justifican crear rama nueva:
   obligatorios). En ese caso, qa-ux respeta el protocolo del cliente,
   no impone el suyo.
 
+Si caso 4 aplica, la rama declara al momento de creación:
+- **Merge plan**: dónde va a aterrizar (`main` o `draft`).
+- **Fecha de cierre estimada**: cuándo se mergea o se mata.
+- **Razón estructural**: por qué NO sirve commitear directo.
+
+Sin estas 3 declaraciones, la rama no se crea. Esto previene
+acumulación de ramas sin patrón claro (observación 2026-06-04: el
+founder tuvo que ejecutar manualmente la limpieza de 6 ramas
+acumuladas sin propósito declarado).
+
 ### 5. Si encontrás ramas cruzadas al arrancar
 
-NO mergear ni borrar sin permiso. Reportar al founder:
-- Qué ramas hay
-- Cuál está adelante de cuál
-- Qué archivos sin commitear hay y en qué rama
-- Recomendar consolidación, pedir Cat 1.
+Auditar como **Capacidad 1 de SKILL-V2-SPEC.md** (Git-hygiene como
+parte del QA-UX). Producir un bloque "Estado del repo" con:
+- Ramas locales + remotas, cuál está adelante/atrás de `main`
+- Worktrees activos vs huérfanos
+- PRs abiertos sin razón estructural
+- Drift entre `main` y `draft`
+- Untracked files (WIP del flow vs basura acumulada)
+
+Para cada zombi detectado, **proponer acción con evidencia**:
+- "Este commit ya está en `main` (SHA visible vía `git branch
+  --contains`), por eso la rama es zombi. Acción: borrar."
+- "Esta rama tiene trabajo no rescatado (commit X no está en `main`
+  ni `draft`). Acción: cherry-pick a `draft`, después borrar."
+
+Si todas las acciones son **Cat 3 reversibles** (la mayoría del
+git-hygiene lo es: revert de merge es 1 comando, branch eliminada
+puede recuperarse desde reflog), el skill ejecuta autónomo y
+reporta. Si alguna es Cat 1 (ej. merge de PR con thousands of lines
+que afecta producción), parar y pedir decisión.
+
+### 5.1 Modelo de colaboración default (sin ramas para mismo equipo)
+
+Cuando el `CLAUDE.md` del cliente declara "commit directo a main" (o
+no declara nada explícito):
+- **Admin / dev principal**: commit directo a `main`. Pull frecuente.
+- **2do dev**: commit directo a `draft`. Pull frecuente desde `main`.
+  Merge a `main` cuando una unidad cierra (mensaje de 1 línea basta,
+  sin ceremonia de PR).
+- **Sesiones paralelas de Claude sobre mismos archivos**: única
+  excepción que justifica rama temporal — y se borra al cerrar.
+
+El skill respeta este modelo. Si dos personas del mismo equipo
+quieren colaborar, no crean ramas: `main` y `draft` alcanzan. El
+merge entre las dos es trabajo de coordinación humana frecuente, no
+ceremonia git.
 
 ### 6. Naming si EXCEPCIONALMENTE creás rama
 

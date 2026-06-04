@@ -90,6 +90,32 @@ skill vivo cuando se promueva v2 (o antes, si entran como hotfix a v1):
       surfacean al founder. Solo 6 momentos críticos (1, 7, 8, 9, +
       arranque y cierre) interrumpen al founder
 
+### Adiciones empíricas 2 — surgidas del cleanup manual del repo Kobra (2026-06-04 post-meeting)
+
+El founder ejecutó manualmente lo que el skill debería hacer
+autónomamente: detectar 6 ramas zombi, merge f4 → main con evidencia
+(PR cerrado, flag protege prod, deploy separado de git), cherry-pick
+rescatando trabajo, push limpio. Eso ES qa-ux operando sobre dev-UX.
+
+Encodeado en SKILL-V2-SPEC.md como sección "Autonomía con evidencia
+— 7 capacidades duras" y en BRANCH-PROTOCOL.md secciones 4 + 5 + 5.1:
+
+- [ ] Capacidad 1 — Git-hygiene como parte del QA-UX: auditar ramas,
+      worktrees, PRs, drift, untracked al inicio de cada corrida.
+      Proponer acción con evidencia para zombis (Cat 3 autónomo si
+      reversible, Cat 1 si afecta prod)
+- [ ] Capacidad 4 — Cada acción declara impacto UX en 3 ejes
+      (usuario, dev, founder). Sin las 3 declaraciones, no ejecuta
+- [ ] Capacidad 5 — Si crea rama (excepcional), declara merge plan +
+      fecha de cierre + razón estructural. Sin las 3, no crea
+- [ ] Capacidad 6 — Modelo "2 personas mismo equipo sin ramas":
+      admin → main, 2do dev → draft, pull frecuente. Sin features
+      branches default
+- [ ] Capacidad 7 — WHY/brief/roadmap/FOUNDER-INPUT como precondición
+      dura. Sin esos 4, ningún cambio sale del skill (ni infra-cleanup)
+- [ ] Sub-rutina nueva: `prompts/auditar-repo-state.md` — invocable
+      como primer paso de carga inicial
+
 ---
 
 ### Pendiente para 0.3.0 — refactor del mental model (NUEVO, founder decide)

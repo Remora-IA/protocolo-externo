@@ -386,3 +386,136 @@ autonomía, founder pierde supervisión". Defensas:
   "iterativo sin parar todo el rato, prefiriendo resultado".
 - Si el founder dice "frená" en cualquier momento, el skill frena. No
   argumenta.
+
+---
+
+## Autonomía con evidencia — 7 capacidades duras (2026-06-04, post-meeting)
+
+Estas capacidades se incorporaron después de que el founder ejecutó
+manualmente lo que el skill debería hacer autónomamente: detectar
+ramas zombi, merge f4 → main con evidencia (PR cerrado, flag protege
+prod, deploy es separado de git), cherry-pick rescatando trabajo,
+push limpio. **Eso ES qa-ux operando sobre dev-UX.** El skill debe
+hacerlo cuando se lo invoca sobre un repo, sin pedir que lo hagan a
+mano.
+
+### Capacidad 1 — Git-hygiene como parte del QA-UX
+
+En la **carga inicial**, antes de hablar de journeys o intents, el
+skill audita el estado del repo:
+
+- Ramas locales + remotas. ¿Cuáles están adelante/atrás de `main`?
+- Worktrees. ¿Cuáles están huérfanos / abandonados?
+- PRs abiertos. ¿Tienen razón de seguir abiertos, o son work-done sin
+  cierre?
+- Drift entre `main` y `draft` (si existe la convención).
+- Untracked files. ¿Son WIP del flow actual o basura acumulada?
+
+Output: un bloque "Estado del repo" antes de la conversación de
+journey. Si detecta zombis o drift, propone acción con evidencia
+(no solo "borrar" — "este commit ya está en main, por eso es zombi").
+
+### Capacidad 2 — Filtro UX-teoría, no diff retrospectivo
+
+Cuando evalúa cambios, el skill NO razona "antes era X, ahora Y".
+Razona contra:
+- `docs/WHY.md`
+- `docs/qa/BRIEF.md` (o el brief vigente del journey)
+- `MEMORY.md` indexado
+- `FOUNDER-INPUT.md` (las secciones críticas 🔴)
+- Roadmap declarado
+
+La pregunta no es "¿está mejor que antes?". Es "¿sirve a la métrica
+que el WHY nombra, dada la evidencia presente?". El código viejo es
+contexto, no baseline.
+
+### Capacidad 3 — Roadmap y versionado obligatorios
+
+Cada decisión del skill referencia un ítem del roadmap activo. Si no
+hay roadmap:
+1. Dispara **Roadmap Doctor** (análogo a Brief Doctor) que produce
+   `docs/roadmap.md` con fases del producto, journeys por fase,
+   scope-outs deliberados.
+2. NO sigue hasta que el founder valida el roadmap derivado.
+
+Cada commit pasa por `/roadmap commitear`. Cada merge dispara
+update del ROADMAP.md (item marcado `[x]` con SHA).
+
+### Capacidad 4 — No mezclar por mezclar
+
+Cada acción (merge, cherry-pick, delete branch, edit file) declara su
+**impacto UX** en una línea, antes de ejecutarse:
+- Impacto en UX del usuario final (¿qué cambia para el deudor / el
+  operador / el cliente?)
+- Impacto en UX del developer (¿qué cambia en el repo, en cómo se
+  navega, en cuántas ramas se ven?)
+- Impacto en UX del founder (¿qué cambia en lo que tiene que
+  supervisar, leer, decidir?)
+
+Si las 3 son neutrales o negativas, la acción no se ejecuta. El skill
+no opera por inercia.
+
+### Capacidad 5 — Ramas con propósito declarado
+
+Si excepcionalmente el skill crea una rama (ver BRANCH-PROTOCOL.md
+casos 4), declara al momento de creación:
+- **Merge plan**: dónde va a aterrizar (`main` o `draft`).
+- **Fecha de cierre estimada**: cuándo se mergea o se mata.
+- **Razón estructural**: por qué NO sirve commitear directo.
+
+Sin estas 3 declaraciones, la rama no se crea. Esto previene
+acumulación de ramas sin patrón claro (problema observado 2026-06-04).
+
+### Capacidad 6 — Colaboración sin ramas para mismo equipo
+
+Modelo de colaboración asumido (per `COLLABORATION.md` del cliente
+cuando existe):
+- **Admin / dev principal**: commit directo a `main`. Pull frecuente.
+- **2do dev**: commit directo a `draft`. Pull frecuente desde `main`.
+  Merge a `main` cuando una unidad cierra (no ceremonia, una línea
+  de mensaje basta).
+- **Sesiones paralelas de Claude sobre mismos archivos**: única
+  excepción que justifica rama temporal — y se borra al cerrar.
+
+El skill respeta este modelo. Si el cliente declara otro
+(trunk-based con flags, gitflow, etc.), el skill respeta el del
+cliente — pero documenta en pendientes-humano si la convención
+acumula ramas zombi.
+
+### Capacidad 7 — WHY como precondición dura
+
+Antes de cualquier cambio (UX, código, infra, doc), el skill verifica:
+- ¿Existe `docs/WHY.md`? Si no → **WHY Doctor** primero.
+- ¿Existe brief vigente del journey? Si no → **Brief Doctor** primero.
+- ¿Existe roadmap? Si no → **Roadmap Doctor** primero.
+- ¿Está `FOUNDER-INPUT.md` con secciones críticas 🔴 llenas? Si no →
+  **una sola pregunta** Cat 1 al founder, espera respuesta.
+
+Sin estos 4, **ningún cambio sale del skill** — ni siquiera
+"infra-cleanup" tipo merge de ramas. La excusa "es solo cleanup" es
+exactamente el sesgo que genera document-soup y ramas zombi.
+
+**Excepción única**: si el repo está roto al punto que estos
+artefactos no se pueden producir (ej. no hay README, no hay nada),
+el skill levanta una sola observación al founder y para. No improvisa
+artefactos.
+
+---
+
+## Cómo verificás que las 7 capacidades funcionan (test empírico)
+
+Cuando invoques `/qa-ux-v2` sobre un repo:
+
+1. ¿El primer output es un "Estado del repo" + "Estado del WHY"
+   antes de cualquier journey? → Capacidad 1 + 7.
+2. ¿Las preguntas Cat 1 (si las hace) están justificadas contra
+   WHY/brief/memorias específicas? → Capacidad 2.
+3. ¿Cada propuesta de acción tiene su línea de impacto UX (usuario,
+   dev, founder)? → Capacidad 4.
+4. ¿Cualquier mención de ramas viene con BRANCH-PROTOCOL.md como
+   referencia? → Capacidad 5 + 6.
+5. ¿Cualquier commit propuesto pasa por `/roadmap commitear`?
+   → Capacidad 3.
+
+Si las 5 verificaciones fallan, el skill v2 está corriendo en modo
+v1 disfrazado. Reportar al founder.
