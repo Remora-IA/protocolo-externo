@@ -100,6 +100,36 @@ journey/loop hasta razón estructural de pausa". Refactor propuesto:
       del LLM, o interacción? Define si el refactor textual basta o
       requiere override explícito del prior
 
+### Lente "integración real" — nueva, EMPÍRICAMENTE VALIDADA 2026-06-04
+
+Cierre prematuro tiene una segunda variante distinta del léxico
+"corrida": el gate F5 puede pasar 10/10 sobre criterios encerrados en
+UI mientras el sistema real no entrega. Detectado en Kobra
+setup-primera-vez: F5 v1 marcó FINAL REAL sobre journey cuyo M5
+mostraba "Carolina arrancó" con 0 deudores en backend y 0
+conversaciones creadas. Founder lo detectó en T+30min por intuición
+("¿por qué siento que no lo veo?"). F6 corrió Customer Journey lens,
+F4-bis cerró deudas IA-buildable, F5 v2 verificó con rúbrica nueva.
+
+- [x] Lente nueva escrita en `prompts/lente-integracion-real.md`
+      con rúbrica R1-R8 (walk técnico, persistencia backend,
+      motor activado, counts UI=backend, error handling, copy sin
+      promesas vacías, memorias respetadas, Cat 3 reversibilidad)
+- [x] Observación empírica documentada en
+      `observaciones-empiricas/integracion-real-validada-2026-06-04.md`
+- [ ] Promover lente a obligatoria en gate F5 cuando journey toca
+      persistencia (la mayoría). Editar ROL-JUEZ.md sección "Gate de
+      cierre F5" para citar R1-R8 + protocolo "GET endpoints antes,
+      caminar, GET endpoints después, calcular delta"
+- [ ] Editar ROL-EXPLORADOR.md modo verificación para que la rúbrica
+      se aplique a CADA path del journey, no solo al principal
+      (sub-gap detectado en F5 v2: M8 unitario también necesitaba
+      wireup además de M4 masivo)
+- [ ] Agregar a tabla "Apéndice — lentes invocables por rol" del
+      COMMAND.md el row: "Auditoría | JUEZ (F5) |
+      `prompts/lente-integracion-real.md` | Journey toca
+      persistence/motor/comunicación"
+
 ---
 
 ## 0.3.0 — frames teóricos explícitos (BACKLOG)
