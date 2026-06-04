@@ -221,11 +221,18 @@ journeys:
 Default journey activo: el primero en `pending`. El humano puede
 overridear en el press release.
 
-### 0.6 — Pre-flight duro de Pieza 11 (solo si la fase entrante es F1)
+### 0.6 — Pre-flight duro de Pieza 11 (si la fase entrante es F1 o F3)
 
 Antes de arrancar Paso 1, si la fase entrante detectada en 0.2 es
-**F1**, chequeá que el BRIEF del proyecto tiene Pieza 11 (Intent Map)
-poblada para el journey activo. ROL-EXPLORADOR.md lo exige
+**F1 o F3**, chequeá que el BRIEF del proyecto tiene Pieza 11 (Intent Map)
+poblada para el journey activo.
+
+**Por qué F1 y F3:** F1 mide K/N + prominencia por intención (requiere
+intención declarada). F3 deriva surfaces per-intención desde axiomas +
+Pieza 11 (requiere intención declarada). Ambas fases caen en "mido/derivo
+contra qué" sin Intent Map. F2 deriva desde F1 (que ya cargó la
+intención); F4 construye lo que F3 propuso; F5 verifica con la intención
+de F1. Solo F1 y F3 son entradas frescas al Intent Map. ROL-EXPLORADOR.md lo exige
 literalmente: *"Si el BRIEF no tiene Pieza 11 poblada → devolvé al
 orquestador con 'falta Intent Map, no arranco F1'. F1 sin intención
 declarada NO corre — caería en 'mido contra qué'."* Hoy ese chequeo no

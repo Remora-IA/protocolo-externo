@@ -448,6 +448,48 @@ mejorar por intención}
 - **El veredicto final es del JUEZ**, no del EXPLORADOR. F5 produce el
   artefacto que el JUEZ revisa antes de declarar journey cerrado.
 
+### Cuando termines F5
+
+Antes de devolver al JUEZ para veredicto, **materializá la comparativa
+ANTES vs DESPUÉS**.
+
+Invocá `~/.claude/qa-ux/prompts/materializar-antes-de-gate.md` aplicando
+la sección **F5**. Producís side-by-side de screenshots F1 (estado
+original) vs screenshots post-F4 (estado verificado), con métricas K/N
++ clicks + CTA→destino + prominencia numéricamente comparadas debajo de
+cada par. El artefacto vive en `docs/qa/canvas/f5-{journey}/`.
+
+Salta esta sub-rutina SOLO si una de las 3 excepciones del gate de
+aplicabilidad aplica (ver `materializar-antes-de-gate.md`). Si dudás,
+**no saltes**.
+
+**Razón:** sin comparativa visual, el veredicto F5 "cerrado/re-abierto"
+es texto. El founder no puede sentir si el journey cambió como
+esperaba. El JUEZ revisa números pero el founder revisa imagen.
+
+Decí al cerrar: **"F5 completada. Verificación en
+`f5-{journey}-{fecha}.md` + comparativa visual en
+`docs/qa/canvas/f5-{journey}/` (URL local: {puerto}). JUEZ revisa para
+veredicto."**
+
+### Gate de cierre F5 — criterios duros (post-condition)
+
+Antes de declarar F5 `completed`, el artefacto del gate
+(`docs/qa/motor/gate-f5-{journey}-{fecha}.md`) debe tener checkbox
+cumplido en:
+
+1. Comparativa pantalla por pantalla con métricas F1 vs F5.
+2. Delta numérico por métrica (clicks −P, K/N A/B → C/D, etc).
+3. Tabla de intenciones huérfanas con estado F1 vs F5.
+4. Veredicto preliminar al JUEZ (cerrado / re-abierto).
+5. **Comparativa visual ANTES vs DESPUÉS materializada en
+   `docs/qa/canvas/f5-{journey}/`** — verificable abriendo la URL local.
+6. Si la sub-rutina materializar saltó por excepción del gate de
+   aplicabilidad, anotar cuál de las 3 excepciones y por qué.
+
+Si falta el criterio 5 sin excepción declarada en 6, F5 queda
+`in_progress`.
+
 ---
 
 ## Estructura del reporte por rol (todos los modos)

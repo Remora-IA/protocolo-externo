@@ -5,18 +5,34 @@ real, construyendo lo que falta — con tres roles que rotan (Explorador,
 Arquitecto UX/UI, Juez Estratégico) y una checklist viva que sobrevive
 entre rotaciones.
 
-## Archivos
+## Archivos activos
 
 | Archivo | Qué es |
 |---|---|
-| `COMMAND.md` | El comando `/qa-ux`. El sistema lo lee vía symlink desde `~/.claude/commands/qa-ux.md` (NO editar el symlink — editar este). |
-| `ROL-EXPLORADOR.md` | Postura curiosa, narración en vivo, descubrimiento de cross-checks. |
-| `ROL-ARQUITECTO.md` | Diseño UX/UI completo del momento que falta + construcción. |
-| `ROL-JUEZ.md` | Auditoría estratégica con marcos teóricos por nombre + gate de checklist. |
-| `PALADIN-PLAYBOOK.md` | Orden eficiente de herramientas del MCP paladin-qa. |
-| `MOTOR.md` | Visión general histórica del motor. Sobrevive como referencia. |
-| `PROTOCOLO.md` | Versión vieja (modo `toolbox`). Sigue disponible para auditorías frías. |
-| `prompts/` | Lentes individuales del modo `toolbox`. |
+| `COMMAND.md` | **Orquestador operativo.** El comando `/qa-ux`. El sistema lo lee vía symlink desde `~/.claude/commands/qa-ux.md` (NO editar el symlink — editar este). |
+| `FASES.md` | **Contrato del loop F1–F5.** Pre/post-conditions, secuenciación, gates. Lo lee `COMMAND.md` en Paso 0.1. |
+| `HANDOFF.md` | Corte por contexto y continuación en sesión nueva. Lo invoca COMMAND.md en Paso 7. |
+| `ROL-EXPLORADOR.md` | Postura curiosa + 3 modos (curioso / medido F1 / verificación F5). |
+| `ROL-ARQUITECTO.md` | Diseño UX/UI + 3 modos (gap-driven / generativo F3 / constructor F4). |
+| `ROL-JUEZ.md` | Auditoría + 2 modos (audit-final / derribo F2). |
+| `PALADIN-PLAYBOOK.md` | Orden eficiente de tools del MCP paladin-qa. |
+| `prompts/` | Lentes individuales (sustracción, inversión, fasing, etc.) invocables como subrutinas desde los roles. Incluye `materializar-antes-de-gate.md` — sub-rutina obligatoria al cierre de F2/F3/F5. |
+
+## Status de `v2/`
+
+Experimento activo. NO está integrado al skill vivo. Contiene M0 Intent
+Storming + ROL-ARQUITECTO con personalidad rediseñadora destructiva. Hay
+evidencia empírica (corrida cobranza-end-to-end 2026-06-03 mañana) de que
+produce insights más profundos que v1. Pendiente: integración con la
+sub-rutina `materializar-antes-de-gate.md` antes de promover. Leer
+`v2/README.md` para detalles.
+
+## Archivado en `historico/`
+
+| Archivo | Por qué archivado |
+|---|---|
+| `MOTOR.md` | Visión histórica del motor antes del state machine. Reemplazado por `FASES.md` (contrato) + `COMMAND.md` (orquestador). |
+| `PROTOCOLO.md` | Versión vieja "modo toolbox" (lentes invocados sueltos sin loop). Reemplazado por el loop F1–F5. Sigue disponible para auditorías frías. |
 
 ## Cómo congelar una versión que funciona
 

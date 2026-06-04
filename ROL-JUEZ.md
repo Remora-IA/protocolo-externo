@@ -384,13 +384,31 @@ NO `completed`. El orquestador chequea la rúbrica en Paso 6.
 
 ### Cuando termines F2
 
-Antes de devolver al orquestador, aplicá la **regla maestra de los
-tres modos** (Anuncio / Propuesta / Pregunta) definida en
-`COMMAND.md`, sección "Tres modos de hablarle al humano". Esto NO es
-opcional: el resumen al humano de F2 históricamente sale con IDs
-internos (SUB1, P1, K/N, Ax3, Pieza 9, I3/I8) y como paquetes de
-preguntas binarias agotantes. El paso de traducción obligatorio fixea
-eso.
+Antes de devolver al orquestador, hacé **dos cosas en secuencia**:
+
+#### Paso A — materializar el derribo (obligatorio salvo excepción declarada)
+
+Invocá `~/.claude/qa-ux/prompts/materializar-antes-de-gate.md` aplicando
+la sección **F2**. Producís screenshots anotados de la UI actual con los
+SUB# señalados visualmente sobre el render real. El artefacto vive en
+`docs/qa/canvas/f2-{journey}/`.
+
+Salta esta sub-rutina SOLO si una de las 3 excepciones del gate de
+aplicabilidad aplica (ver `materializar-antes-de-gate.md` sección "Cuándo
+NO correr"). Si dudás, **no saltes**.
+
+**Razón:** sin materialización, el checkpoint F2→F3 es placebo. El
+humano lee "SUB1: SUBTRACT operativo del 14 ítems" pero no ve dónde
+están los 14 ítems ni cómo se ven cayendo. Decide a ciegas.
+
+#### Paso B — clasificar A/P/P y cerrar
+
+Aplicá la **regla maestra de los tres modos** (Anuncio / Propuesta /
+Pregunta) definida en `COMMAND.md`, sección "Tres modos de hablarle al
+humano". Esto NO es opcional: el resumen al humano de F2 históricamente
+sale con IDs internos (SUB1, P1, K/N, Ax3, Pieza 9, I3/I8) y como
+paquetes de preguntas binarias agotantes. El paso de traducción
+obligatorio fixea eso.
 
 Concretamente, antes de mostrar tu cierre al humano:
 
@@ -423,10 +441,30 @@ Después (granulado + traducido + clasificado):
 > ejecuta-y-olvida.)"*
 
 Recién después de aplicar el paso de traducción, decí: **"F2
-completada. Lista de derribo en `f2-{journey}-{fecha}.md`. Checkpoint
-F2→F3: {N} anuncios, {M} propuestas, {K} preguntas para vos."** Devolvé
-al orquestador. El orquestador maneja el checkpoint según el press
-release inicial.
+completada. Lista de derribo en `f2-{journey}-{fecha}.md` + canvas
+anotado en `docs/qa/canvas/f2-{journey}/` (URL local: {puerto}).
+Checkpoint F2→F3: {N} anuncios, {M} propuestas, {K} preguntas para
+vos."** Devolvé al orquestador. El orquestador maneja el checkpoint
+según el press release inicial.
+
+### Gate de cierre F2 — criterios duros (post-condition)
+
+Antes de declarar F2 `completed`, el artefacto del gate
+(`docs/qa/motor/gate-f2-{journey}-{fecha}.md`) debe tener checkbox
+cumplido en:
+
+1. Lista de derribo con SUB# y severidad.
+2. Cada SUB con trazabilidad a axioma + Pieza 11 + 1 línea de racional.
+3. Rúbrica de cierre F2 (las preguntas duras del modo derribo).
+4. Clasificación A/P/P del cierre.
+5. **Canvas materializado en `docs/qa/canvas/f2-{journey}/` con SUB#
+   anotados visualmente sobre la UI actual** — verificable abriendo la
+   URL local.
+6. Si la sub-rutina materializar saltó por excepción del gate de
+   aplicabilidad, anotar cuál de las 3 excepciones y por qué.
+
+Si falta el criterio 5 sin excepción declarada en 6, F2 queda
+`in_progress`.
 
 ---
 

@@ -286,12 +286,32 @@ falta}
 
 ### Cuando termines F3
 
-Antes de devolver al orquestador, aplicá la **regla maestra de los
-tres modos** (Anuncio / Propuesta / Pregunta) definida en
-`COMMAND.md`, sección "Tres modos de hablarle al humano". El
-checkpoint F3→F4 es donde el humano autoriza tocar código — si la
-propuesta sale con jerga del skill o como paquetes de "¿confirmás?",
-el humano se desconecta del momento más caro del ciclo.
+Antes de devolver al orquestador, hacé **dos cosas en secuencia**:
+
+#### Paso A — materializar la propuesta (obligatorio salvo excepción declarada)
+
+Invocá `~/.claude/qa-ux/prompts/materializar-antes-de-gate.md` aplicando
+la sección **F3**. Producís los HTMLs navegables de los surfaces
+derivados, con tokens reales del producto, walking experience, flow-note
+axiomática y index meta-layer. El artefacto vive en
+`docs/qa/canvas/f3-{journey}/`.
+
+Salta esta sub-rutina SOLO si una de las 3 excepciones del gate de
+aplicabilidad aplica (ver `materializar-antes-de-gate.md` sección "Cuándo
+NO correr"). Si dudás, **no saltes**.
+
+**Razón:** sin materialización, el checkpoint F3→F4 es placebo. El
+humano lee Markdown sobre una propuesta de UI y firma a ciegas o no
+firma. El medio del artefacto debe coincidir con el medio donde la
+decisión se ejecuta.
+
+#### Paso B — clasificar A/P/P y cerrar
+
+Aplicá la **regla maestra de los tres modos** (Anuncio / Propuesta /
+Pregunta) definida en `COMMAND.md`, sección "Tres modos de hablarle al
+humano". El checkpoint F3→F4 es donde el humano autoriza tocar código —
+si la propuesta sale con jerga del skill o como paquetes de
+"¿confirmás?", el humano se desconecta del momento más caro del ciclo.
 
 Concretamente, antes de mostrar tu cierre al humano:
 
@@ -304,8 +324,30 @@ Concretamente, antes de mostrar tu cierre al humano:
 4. Granulá una decisión por línea.
 
 Recién después decí: **"F3 completada. Propuesta en
-`f3-{journey}-{fecha}.md`. Checkpoint F3→F4: {N} anuncios, {M}
-propuestas, {K} preguntas para vos."** Devolvé al orquestador.
+`f3-{journey}-{fecha}.md` + canvas navegable en
+`docs/qa/canvas/f3-{journey}/` (URL local: {puerto}). Checkpoint F3→F4:
+{N} anuncios, {M} propuestas, {K} preguntas para vos."** Devolvé al
+orquestador.
+
+### Gate de cierre F3 — criterios duros (post-condition)
+
+Antes de declarar F3 `completed` (ver Paso 6 de COMMAND.md), el
+artefacto del gate (`docs/qa/motor/gate-f3-{journey}-{fecha}.md`) debe
+tener checkbox cumplido en:
+
+1. Surfaces derivadas con cadena axiomática literal por elemento.
+2. Sección "Pregunta 2" — inventario actual chequeado contra derivación.
+3. Sección "Pregunta 3" — surfaces nuevas listadas con coordenadas F4.
+4. Tensión-check con fixes previos (absorbido / invalidado / independiente).
+5. Clasificación A/P/P del cierre.
+6. **Canvas materializado en `docs/qa/canvas/f3-{journey}/` con las 5
+   propiedades obligatorias (specificity, walking, cadena visible,
+   tokens reales, index meta-layer)** — verificable abriendo la URL local.
+7. Si la sub-rutina materializar saltó por excepción del gate de
+   aplicabilidad, anotar cuál de las 3 excepciones y por qué.
+
+Si falta el criterio 6 sin excepción declarada en 7, F3 queda
+`in_progress`. Sin canvas, el gate F3→F4 vuelve a ser placebo.
 
 ---
 
