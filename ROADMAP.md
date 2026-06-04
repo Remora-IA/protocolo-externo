@@ -115,6 +115,14 @@ Encodeado en SKILL-V2-SPEC.md como sección "Autonomía con evidencia
       dura. Sin esos 4, ningún cambio sale del skill (ni infra-cleanup)
 - [ ] Sub-rutina nueva: `prompts/auditar-repo-state.md` — invocable
       como primer paso de carga inicial
+- [x] **Validación gate-keeper de v2** (Cap 1, 4, 7) — corrida real
+      2026-06-04. v2 honró memoria `kobra-blocker-real`, produjo
+      tabla impacto UX 3 ejes, defaulteó con racional cuando founder
+      dijo "decidí vos". Diff claro vs v1. Evidencia:
+      `observaciones-empiricas/v2-primera-corrida-2026-06-04.md`
+- [ ] **Validación operador de v2** (Cap 2, 3, 5, 6 + silencio +
+      tangibilización end-to-end) — pendiente próximo journey real
+      que el founder decida correr
 
 ---
 
