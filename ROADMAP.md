@@ -54,11 +54,12 @@ que ignora el panel actual sin justificarse en F2.
       silencio" + expansión de #10 con 4 capas (intra-fase, intra-journey,
       inter-journey, ROADMAP). Evidencia:
       observaciones-empiricas/cierre-prematuro-corridas-2026-06-04.md
-- [ ] Auditar v2/M0 Intent Storming vs Pieza 11 del BRIEF — ¿M0 es
-      essential complexity nueva o accidental redundante? (commit
-      subject: `0.2.0: auditar M0 vs Pieza 11`)
-- [ ] Decidir merge plan: si M0 reemplaza Pieza 11, archivar v2/; si
-      M0 complementa, documentar flujo combinado
+- [x] Auditar v2/M0 Intent Storming vs Pieza 11 del BRIEF — la spec
+      v2 los integra en una sola estructura (bba1bf0)
+- [x] Decidir merge plan: v2 archivado como referencia hasta validación
+      empírica en corrida real. NO promover a vivo todavía (Cat 2 sin
+      evidencia, memoria `feedback-validar-skill-antes-commitear`).
+      Spec consolidada en v2/SKILL-V2-SPEC.md (bba1bf0)
 - [ ] Promover v2/ROL-ARQUITECTO al ROL-ARQUITECTO vivo con modo
       "destructivo" disponible alongside "generativo F3"
 - [ ] Sub-rutina nueva: `cuando-activar-destructivo.md` con criterios
@@ -66,6 +67,28 @@ que ignora el panel actual sin justificarse en F2.
 - [ ] Validar empíricamente sobre un journey de Kobra o SynthesGuard
       donde producto actual está lejos del WHY
 - [ ] Documentar el patrón en observaciones-empiricas/
+
+### Adiciones empíricas a 0.2.0 — surgidas del ejercicio narrativa (2026-06-04)
+
+Escribir `v2/NARRATIVA-DEMO-KOBRA.md` (guión turno-a-turno de la spec
+operando sobre Kobra) expuso 4 gaps que la spec sola no detectaba.
+Integrados en SKILL-V2-SPEC.md como diseño; pendiente de portarlos al
+skill vivo cuando se promueva v2 (o antes, si entran como hotfix a v1):
+
+- [ ] Disciplina de construcción en Paso E — 6 reglas (una vista =
+      pocos archivos coherentes, commits chicos por vista, no
+      reescribir lo que funciona, sin abstracciones especulativas,
+      naming en lenguaje del producto, smoke-test obligatorio)
+- [ ] Preview-down protocol en Paso F — si el ambiente no levanta, NO
+      simular verificación. Paso F bloqueado, journey queda en
+      `e-done, esperando F`
+- [ ] Roadmap Doctor en carga inicial — si no hay roadmap declarado en
+      el proyecto cliente, disparar análogo a Brief Doctor que produce
+      `docs/roadmap.md` con fases, journeys por fase, scope-outs
+- [ ] Re-balance turnos silenciosos vs surface — pasos A/B/C/D del
+      Movimiento 0 documentan en artefacto `current/` pero no
+      surfacean al founder. Solo 6 momentos críticos (1, 7, 8, 9, +
+      arranque y cierre) interrumpen al founder
 
 ---
 
