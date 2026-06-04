@@ -48,6 +48,12 @@ journey donde el producto actual NO debería existir (ej: WhatsApp como
 lugar primario de la dueña, no panel) y ver que F3 propone un sistema
 que ignora el panel actual sin justificarse en F2.
 
+- [x] Anti-patrones A/P/P contra cierre prematuro de corrida — 3
+      nuevos (re-evaluar fase entrante / "Próxima corrida" léxico /
+      journey efímero) + extensión de #8 con variante "pausa por
+      silencio" + expansión de #10 con 4 capas (intra-fase, intra-journey,
+      inter-journey, ROADMAP). Evidencia:
+      observaciones-empiricas/cierre-prematuro-corridas-2026-06-04.md
 - [ ] Auditar v2/M0 Intent Storming vs Pieza 11 del BRIEF — ¿M0 es
       essential complexity nueva o accidental redundante? (commit
       subject: `0.2.0: auditar M0 vs Pieza 11`)
@@ -60,6 +66,39 @@ que ignora el panel actual sin justificarse en F2.
 - [ ] Validar empíricamente sobre un journey de Kobra o SynthesGuard
       donde producto actual está lejos del WHY
 - [ ] Documentar el patrón en observaciones-empiricas/
+
+---
+
+### Pendiente para 0.3.0 — refactor del mental model (NUEVO, founder decide)
+
+Cierre prematuro tiene causa más profunda que los anti-patrones
+textuales que entraron en 0.2.0. El skill se piensa "una corrida =
+una fase, termino y espero" en vez de "agente persistente sobre el
+journey/loop hasta razón estructural de pausa". Refactor propuesto:
+
+- [ ] Invertir polo del default — "sigo salvo razón estructural para
+      pausar" en vez de "espero salvo permiso para seguir". Las 5
+      razones para pausar quedan explícitas: checkpoint humano
+      obligatorio declarado por FASES.md, Cat 1 puro pendiente,
+      contexto ≥80%, loop del producto completo + ROADMAP del skill
+      sin ítems aplicables, founder dijo "parar"
+- [ ] Renombrar sección "Convergencia" (COMMAND.md 587) → "Razones
+      para pausar". Loop completo es UNA razón, no la única
+- [ ] Vocabulario nuevo: "corrida" = una fase, "ciclo del journey" =
+      F1→F5 sobre un journey, "loop del producto" = todos los
+      journeys + ROADMAP del skill. Aplicado consistente en
+      COMMAND.md y FASES.md
+- [ ] Re-encuadrar COMMAND.md de "secuencia lineal Paso 0→7→
+      Convergencia" a "state machine re-entrante con razones de
+      pausa explícitas"
+- [ ] Validación empírica obligatoria antes de commit (memoria
+      `feedback-validar-skill-antes-commitear`): una corrida sobre
+      Kobra arranca F1 setup-primera-vez y debería terminar F2 sin
+      re-invocación
+- [ ] Experimento de diagnóstico causal Q2 (sección 8.2 del análisis)
+      antes del refactor: ¿el cierre prematuro es spec puro, training
+      del LLM, o interacción? Define si el refactor textual basta o
+      requiere override explícito del prior
 
 ---
 
