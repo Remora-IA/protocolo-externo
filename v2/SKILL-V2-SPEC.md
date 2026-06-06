@@ -217,9 +217,14 @@ Jerarquía resumida (de barato a caro — no saltear niveles):
 4. `javascript_tool` → React controlled inputs, contenteditable, confirmar estado de DOM.
 5. `computer.left_click` por coordenadas → ÚLTIMO RECURSO. Máx 2 intentos, después subir a Nivel 4.
 
-Regla dura: **no usar `computer.screenshot` para verificar estado.** Usar `read_console_messages`
-o `read_network_requests` o `javascript_tool` para leer estado del DOM/red — es más rápido y no
-infla el contexto con imágenes.
+Regla dura: **no usar `computer.screenshot` para navegar o verificar estado.** Para eso:
+`read_console_messages`, `read_network_requests`, `javascript_tool`. Son más rápidos y no
+inflan el contexto con imágenes.
+
+`computer.screenshot` con `save_to_disk` se reserva para **evidencia deliberada** — cuando
+encontraste una falla UX con teoría nombrada, una brecha de integración, o al cerrar un
+journey como artefacto final. Protocolo completo: `~/.claude/qa-ux/qa/EVIDENCE-PROTOCOL.md`.
+La imagen aparece inline en la sesión (el founder la ve) y queda en `docs/qa/evidence/`.
 
 - Abrir el producto en ambiente real con Paladin QA (env vars default de producción
   — NO sandbox, NO flag forzado, NO ruta separada /tour).
@@ -329,19 +334,27 @@ UX es continuo. Al final del loop sobre un journey:
 `docs/qa/resultados/` con `f1-`, `f2-`, etc.):
 
 ```
-docs/qa/
-  spec.md                              (referencia a este archivo)
-  motor.yaml                           (roadmap + journeys + fase MVP)
-  current/
-    journey-{slug}.md                  (storyboard + walk-inversion +
-                                        walk-persona + contraste +
-                                        tangibilización — TODO en un
-                                        archivo, secciones internas)
-  historico/
-    journey-{slug}-{YYYY-MM-DD}.md     (versiones superadas)
-  pendientes-humano.md                 (Cat 1 defaulteadas esperando
-                                        revisión)
+docs/
+  ux/
+    current/
+      journey-{slug}.md                (storyboard + walk-inversion +
+                                        walk-persona + contraste —
+                                        artefactos de DISEÑO, Pasos A-D)
+    historico/
+      journey-{slug}-{YYYY-MM-DD}.md  (versiones de diseño superadas)
+  qa/
+    spec.md                            (referencia a este archivo)
+    motor.yaml                         (roadmap + journeys + fase MVP)
+    evidence/
+      {journey}-{tipo}-{fecha}.jpg     (screenshots de evidencia —
+                                        ver ~/.claude/qa-ux/qa/EVIDENCE-PROTOCOL.md)
+    pendientes-humano.md               (Cat 1 defaulteadas esperando revisión)
 ```
+
+Separación deliberada: `docs/ux/` contiene artefactos de pensamiento (storyboards,
+inversión, persona). `docs/qa/` contiene artefactos de verificación (motor, evidencia
+fotográfica, pendencias). La tangibilización (código, vistas construidas) vive en el
+árbol del proyecto, no en `docs/`.
 
 **Reglas duras:**
 

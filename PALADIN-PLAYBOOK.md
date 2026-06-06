@@ -4,6 +4,31 @@
 > las cosas. Esta es la jerarquía correcta — usá la más alta que sirva al
 > caso, NO bajes a la siguiente hasta que la actual falle dos veces.
 
+## Screenshots: solo como evidencia deliberada
+
+`computer.screenshot` NO está en la jerarquía de navegación. Es una
+herramienta de evidencia — se usa cuando ya tenés lo que querés mostrar,
+no para ver dónde estás.
+
+**Cuándo SÍ:**
+- Encontraste una falla UX ligada a una teoría (Norman, Krug, Nielsen, Sweller)
+  → screenshot nombra la teoría, muestra el estado problemático, se guarda con
+  `save_to_disk: "docs/qa/evidence/{journey}-{tipo}-{fecha}.jpg"`
+- Verificaste una brecha de integración (UI dice X, backend tiene Y)
+  → screenshot como evidencia de la discrepancia
+- Journey marcado DONE → un screenshot del estado final como artefacto permanente
+
+**Cuándo NO:**
+- Para ver dónde estás → usá `read_page`
+- Para confirmar que un click funcionó → usá `read_console_messages`
+- Para verificar estado del backend → usá `read_network_requests`
+- "Por las dudas" o para orientarte → `read_page` primero, siempre
+
+El screenshot aparece inline en la sesión (el founder lo ve en el momento)
+Y se guarda en disco. Protocolo completo: `~/.claude/qa-ux/qa/EVIDENCE-PROTOCOL.md`.
+
+---
+
 ## Jerarquía de herramientas (de barata a cara, de robusta a frágil)
 
 ### Nivel 1 — Entender antes de tocar
