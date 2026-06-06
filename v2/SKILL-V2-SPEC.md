@@ -191,17 +191,46 @@ Para el journey activo, ejecutar en orden:
   importar el componente nuevo en una página existente y verificar
   que renderea sin error. Cualquier error de TypeScript o runtime que
   el linter detecta = paso E sigue `in_progress`.
+  Protocolo de smoke-test (sin screenshots):
+  1. `tabs_context_mcp` → confirmar tab activo
+  2. `navigate` → URL de la vista nueva
+  3. `read_page` → verificar que el árbol semántico cargó (componente visible en el árbol)
+  4. `read_console_messages {onlyErrors: true}` → cero errores runtime
+  Si el árbol no tiene el componente o hay errores → paso E sigue `in_progress`.
 
 ### Paso F — Verificación en ambiente real (UNA pausa, al final)
 
-- Abrir el producto en ambiente real (env vars default de producción
+**Herramienta obligatoria: `mcp__paladin-qa__*` (Paladin QA) — SIEMPRE.**
+**`mcp__Claude_Preview__*` (Claude Preview) está PROHIBIDO en este paso.**
+
+Distinción crítica:
+- Claude Preview = verificación técnica (¿compila? ¿responde el servidor?) — esto NO es Paso F.
+- Paladin QA = verificación de usuario real (¿puede el operador/deudor cumplir su objetivo?) — esto ES Paso F.
+
+El Paso F que no usa Paladin QA no es Paso F. Es verificación técnica disfrazada.
+
+**Protocolo de herramientas obligatorio — seguir `~/.claude/qa-ux/PALADIN-PLAYBOOK.md`.**
+Jerarquía resumida (de barato a caro — no saltear niveles):
+1. `read_page` / `get_page_text` → árbol semántico. SIEMPRE el primer call en pantalla nueva.
+2. `find "descripción semántica"` → localizar elementos por texto/rol. No por coordenadas.
+3. `form_input`, `navigate`, `shortcuts_execute` → interacción estándar.
+4. `javascript_tool` → React controlled inputs, contenteditable, confirmar estado de DOM.
+5. `computer.left_click` por coordenadas → ÚLTIMO RECURSO. Máx 2 intentos, después subir a Nivel 4.
+
+Regla dura: **no usar `computer.screenshot` para verificar estado.** Usar `read_console_messages`
+o `read_network_requests` o `javascript_tool` para leer estado del DOM/red — es más rápido y no
+infla el contexto con imágenes.
+
+- Abrir el producto en ambiente real con Paladin QA (env vars default de producción
   — NO sandbox, NO flag forzado, NO ruta separada /tour).
 - Caminar como usuario real declarado.
 - Verificar:
   - ¿Ve lo nuevo en el camino que toma por default? (REEMPLAZA, no
     ACOMPAÑA — flag off-by-default no califica como REEMPLAZA.)
-  - ¿Persistencia / motor / integración real funcionan? (GET endpoints
-    antes, walk, GET después, comparar delta.)
+  - ¿Persistencia / motor / integración real funcionan? Protocolo:
+    `read_network_requests` antes del walk (baseline) → ejecutar acción →
+    `read_network_requests` después (delta). Comparar. No necesita screenshot
+    para confirmar que el backend recibió datos.
 - Si ACOMPAÑA → devolver al founder pregunta literal: *"Construí X
   pero el usuario real sigue viendo Y. ¿Borrás Y o convivís? Sin esa
   decisión, no es FINAL."*
