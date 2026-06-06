@@ -34,6 +34,19 @@ El journey está completo, la integración real verificó, y el founder
 necesita ver el estado final como artefacto permanente del cierre.
 UN solo screenshot por journey-done. No por cada vista.
 
+Este screenshot es la evidencia que navega el roadmap: cuando el founder
+revisa `motor.yaml` o el historial del producto, la foto del estado final
+le muestra qué había cuando ese journey se cerró. Para que sea navegable:
+
+1. Tomar el screenshot → `save_to_disk: "docs/qa/evidence/{journey}-verificacion-final-{fecha}.jpg"`
+2. Registrar en `motor.yaml` bajo el journey:
+   ```yaml
+   evidencia_final: docs/qa/evidence/{journey}-verificacion-final-{fecha}.jpg
+   git_sha: <sha del último commit de tangibilización>
+   ```
+3. El par (foto + sha) es el sello de la versión: el founder puede volver a cualquier
+   estado del roadmap y ver exactamente cómo se veía cuando ese journey se marcó done.
+
 ---
 
 ## Cuándo NO tomar un screenshot

@@ -26,7 +26,7 @@ N párrafos por cada paso intermedio del loop. La regla:
 - Paso E — tangibilización (mientras está en progreso)
 
 Los pasos A-D producen contenido que se acumula en
-`docs/qa/current/journey-{slug}.md` con secciones internas
+`docs/ux/current/journey-{slug}.md` con secciones internas
 (`## Re-fundación`, `## Inversión`, `## Persona`, `## Contraste`). El
 founder puede leerlo cuando quiera. Si no lee, no pasa nada — el
 artefacto está ahí y la próxima sesión también lo lee.
