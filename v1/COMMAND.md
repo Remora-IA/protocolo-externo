@@ -10,11 +10,11 @@ Sos el **ORQUESTADOR** del motor QA-UX. El humano invocó `/qa-ux $ARGUMENTS`.
 El motor NO está en este archivo. Este archivo orquesta. La inteligencia
 vive en archivos chicos que se cargan SOLO cuando hace falta:
 
-- `~/.claude/qa-ux/FASES.md` — **contrato del loop de 5 fases (F1-F5).** Léelo en Paso 0 SIEMPRE.
-- `~/.claude/qa-ux/HANDOFF.md` — **corte por contexto y continuación en sesión nueva.** Léelo en Paso 7.
-- `~/.claude/qa-ux/ROL-EXPLORADOR.md` — caminata (modo curioso default, modo medido F1, modo verificación F5).
-- `~/.claude/qa-ux/ROL-ARQUITECTO.md` — diseño UX/UI (modo gap-driven default, modo generativo F3, modo constructor F4).
-- `~/.claude/qa-ux/ROL-JUEZ.md` — auditoría (modo audit-final default, modo derribo F2).
+- `~/.claude/qa-ux/v1/FASES.md` — **contrato del loop de 5 fases (F1-F5).** Léelo en Paso 0 SIEMPRE.
+- `~/.claude/qa-ux/v1/HANDOFF.md` — **corte por contexto y continuación en sesión nueva.** Léelo en Paso 7.
+- `~/.claude/qa-ux/v1/ROL-EXPLORADOR.md` — caminata (modo curioso default, modo medido F1, modo verificación F5).
+- `~/.claude/qa-ux/v1/ROL-ARQUITECTO.md` — diseño UX/UI (modo gap-driven default, modo generativo F3, modo constructor F4).
+- `~/.claude/qa-ux/v1/ROL-JUEZ.md` — auditoría (modo audit-final default, modo derribo F2).
 - `~/.claude/qa-ux/PALADIN-PLAYBOOK.md` — orden eficiente de herramientas de paladin-qa.
 
 Tu trabajo como orquestador: recibir inputs, **decidir qué fase entra**,
@@ -412,7 +412,7 @@ Asegurate que `paladin-qa` esté conectado. Si no, parate y reportá
 
 ## Paso 3 — Entrá al rol EXPLORADOR
 
-Leé `~/.claude/qa-ux/ROL-EXPLORADOR.md`. Anunciá: **"Entro a modo
+Leé `~/.claude/qa-ux/v1/ROL-EXPLORADOR.md`. Anunciá: **"Entro a modo
 EXPLORADOR."** Seguí el manual del archivo.
 
 **Recordatorio cuando entrás al rol:** las memorias activas cargadas
@@ -428,7 +428,7 @@ Caminá hasta que pase uno de estos tres:
 
 ## Paso 4 — Cuando el EXPLORADOR encuentra un gap
 
-Leé `~/.claude/qa-ux/ROL-ARQUITECTO.md`. Anunciá: **"Cambio a modo
+Leé `~/.claude/qa-ux/v1/ROL-ARQUITECTO.md`. Anunciá: **"Cambio a modo
 ARQUITECTO UX/UI."** Seguí el manual.
 
 **Recordatorio:** las memorias activas (Paso 0.0) son vinculantes
@@ -443,7 +443,7 @@ solo.
 ## Paso 5 — Antes de declarar EL FINAL, pasá por el JUEZ
 
 OBLIGATORIO. No declares "llegué al final" inline. Leé
-`~/.claude/qa-ux/ROL-JUEZ.md`. Anunciá: **"Cambio a modo JUEZ
+`~/.claude/qa-ux/v1/ROL-JUEZ.md`. Anunciá: **"Cambio a modo JUEZ
 ESTRATÉGICO."** Seguí el manual.
 
 **Recordatorio:** las memorias activas (Paso 0.0) son vinculantes
@@ -570,7 +570,7 @@ Actualizá `motor.yaml.journeys[].estado` al nuevo nivel
 ## Paso 7 — Handoff por contexto (si aplica)
 
 Si el contexto está en ~80% al terminar Paso 6, NO arranques la
-próxima fase. Leé `~/.claude/qa-ux/HANDOFF.md` y seguí su protocolo:
+próxima fase. Leé `~/.claude/qa-ux/v1/HANDOFF.md` y seguí su protocolo:
 
 1. Escribí `docs/qa/resultados/handoff-{fase}-{YYYY-MM-DD-HHmm}.md`
    con el snapshot completo.

@@ -467,7 +467,7 @@ mejorar por intención}
 Antes de devolver al JUEZ para veredicto, **materializá la comparativa
 ANTES vs DESPUÉS**.
 
-Invocá `~/.claude/qa-ux/prompts/materializar-antes-de-gate.md` aplicando
+Invocá `~/.claude/qa-ux/v1/prompts/materializar-antes-de-gate.md` aplicando
 la sección **F5**. Producís side-by-side de screenshots F1 (estado
 original) vs screenshots post-F4 (estado verificado), con métricas K/N
 + clicks + CTA→destino + prominencia numéricamente comparadas debajo de

@@ -290,7 +290,7 @@ Antes de devolver al orquestador, hacé **dos cosas en secuencia**:
 
 #### Paso A — materializar la propuesta (obligatorio salvo excepción declarada)
 
-Invocá `~/.claude/qa-ux/prompts/materializar-antes-de-gate.md` aplicando
+Invocá `~/.claude/qa-ux/v1/prompts/materializar-antes-de-gate.md` aplicando
 la sección **F3**. Producís los HTMLs navegables de los surfaces
 derivados, con tokens reales del producto, walking experience, flow-note
 axiomática y index meta-layer. El artefacto vive en

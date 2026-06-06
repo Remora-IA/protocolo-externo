@@ -412,7 +412,7 @@ Antes de devolver al orquestador, hacé **dos cosas en secuencia**:
 
 #### Paso A — materializar el derribo (obligatorio salvo excepción declarada)
 
-Invocá `~/.claude/qa-ux/prompts/materializar-antes-de-gate.md` aplicando
+Invocá `~/.claude/qa-ux/v1/prompts/materializar-antes-de-gate.md` aplicando
 la sección **F2**. Producís screenshots anotados de la UI actual con los
 SUB# señalados visualmente sobre el render real. El artefacto vive en
 `docs/qa/canvas/f2-{journey}/`.
