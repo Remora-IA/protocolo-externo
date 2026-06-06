@@ -1,99 +1,88 @@
-# QA-UX Motor
+# Paladin QA
 
-Skill de Claude Code que camina cualquier producto hasta su outcome
-real, construyendo lo que falta — con verificación en ambiente real y
-evidencia fotográfica de cada gap encontrado.
+Sistema completo de QA-UX para Claude Code: extensión de Chrome que da
+acceso al browser + skill que define la metodología para usarlo.
 
-## Estructura del repositorio
+## Instalación
+
+```bash
+# 1. Clonar en la ubicación correcta (el skill requiere este path)
+git clone https://github.com/Remora-IA/skill-qa-ux.git ~/.claude/qa-ux
+
+# 2. Cargar la extensión en el browser
+#    chrome://extensions → Developer Mode → Load unpacked → seleccionar extension/
+
+# 3. Copiar el extension ID y ejecutar:
+cd ~/.claude/qa-ux
+./install.sh <extension-id>
+
+# 4. Agregar el MCP server a Claude Code:
+claude mcp add paladin-qa -- node ~/.claude/qa-ux/extension/host/mcp-server.js
+```
+
+---
+
+## Estructura del repo
 
 ```
-qa-ux/
-  v1/            ← versión estable (F1-F5, 3 roles, loop de fases)
-  v2/            ← versión en preparación (loop iterativo, spec consolidada)
-  qa/            ← protocolo de evidencia y verificación (comparten v1 y v2)
-  ux/            ← metodología de diseño (comparte v1 y v2)
-  observaciones-empiricas/   ← hallazgos del skill operando en proyectos reales
-  PALADIN-PLAYBOOK.md        ← jerarquía de herramientas browser (compartido)
-  BRANCH-PROTOCOL.md         ← protocolo de ramas (compartido)
-  ROADMAP.md                 ← roadmap del skill con semver
-  COMMAND-V2.md              ← puente hacia v2/SKILL-V2-SPEC.md
+skill-qa-ux/
+  extension/                   ← Extensión Chrome (Paladin QA)
+    manifest.json
+    background.js
+    content.js
+    icons/
+    host/
+      mcp-server.js            ← MCP server (Claude Code lo invoca)
+      native-host.js           ← Native messaging host (el browser lo invoca)
+      package.json
+  install.sh                   ← Instala la extensión + registra el MCP
+  COMMAND.md                   ← Entry point del skill /qa-ux
+  PALADIN-PLAYBOOK.md          ← Jerarquía de herramientas browser
+  BRANCH-PROTOCOL.md           ← Protocolo de ramas
+  ROADMAP.md                   ← Roadmap del skill con semver
+  v2/SKILL-V2-SPEC.md          ← Spec operativa del skill (loop A-F)
+  v1/                          ← Versión anterior (histórico)
+  qa/EVIDENCE-PROTOCOL.md      ← Cuándo y cómo tomar screenshots de evidencia
+  ux/                          ← Metodología de diseño
+  observaciones-empiricas/     ← Hallazgos de corridas reales
 ```
 
 ---
 
-## v1 — versión estable
+## Cómo funciona
 
-**Comando:** `/qa-ux`
-**Archivos:** `v1/COMMAND.md`, `v1/FASES.md`, `v1/ROL-*.md`, `v1/prompts/`
+**La extensión** (`extension/`) se carga en Chrome/Brave/Edge y expone
+herramientas de browser automation vía native messaging. Cuando Claude Code
+invoca `mcp__paladin-qa__*`, el MCP server (`host/mcp-server.js`) recibe
+la llamada y la delega al browser a través del native host.
 
-Loop de 5 fases (F1 caminata medida → F2 crítica → F3 re-fundación →
-F4 construcción → F5 verificación) con 3 roles que rotan (Explorador,
-Arquitecto, Juez) y gate de post-condition antes de cada transición.
+**El skill** (`COMMAND.md` → `v2/SKILL-V2-SPEC.md`) define la metodología:
+cómo caminar un producto desde teoría hasta verificación en ambiente real,
+qué construir, cómo usar las herramientas del browser eficientemente, y
+cuándo tomar screenshots como evidencia.
 
-| Archivo | Qué es |
-|---|---|
-| `v1/COMMAND.md` | Orquestador principal. Lo lee el comando `/qa-ux`. |
-| `v1/FASES.md` | Contrato del loop F1–F5. Pre/post-conditions, secuenciación, gates. |
-| `v1/HANDOFF.md` | Corte por contexto y continuación en sesión nueva. |
-| `v1/ROL-EXPLORADOR.md` | Postura curiosa + 3 modos. |
-| `v1/ROL-ARQUITECTO.md` | Diseño UX/UI + 3 modos. |
-| `v1/ROL-JUEZ.md` | Auditoría + 2 modos. |
-| `v1/prompts/` | Lentes invocables (sustracción, inversión, fasing, integración real, etc.) |
-| `v1/historico/` | Versiones archivadas de documentos de diseño del skill. |
+**El playbook** (`PALADIN-PLAYBOOK.md`) es el protocolo de uso eficiente:
+jerarquía de 6 niveles (read_page → find → form_input → javascript_tool →
+computer → API). El skill lo sigue; los screenshots son solo evidencia
+deliberada, no navegación.
 
----
-
-## v2 — versión activa (único comando)
-
-**Comando:** `/qa-ux`
-**Archivos:** `COMMAND.md` (raíz) → `v2/SKILL-V2-SPEC.md`
-
-Un solo loop iterativo (Pasos A-F) sin fases explícitas. El skill trabaja
-en silencio y sólo surface al founder en 6 momentos definidos. Verificación
-obligatoria con Paladin QA al final (Paso F). Screenshot únicamente como
-evidencia deliberada con `save_to_disk`.
-
-Estado de validación:
-- ✅ Capacidades 1, 4, 7 (git-hygiene, impacto UX 3 ejes, WHY como precondición)
-- ⏳ Capacidades 2, 3, 5, 6 + tangibilización end-to-end — pendientes de corrida operadora real
+**Uso:** invocar `/qa-ux` en cualquier sesión de Claude Code sobre el
+proyecto a evaluar. El skill corre en silencio y solo habla al founder
+en 6 momentos definidos.
 
 ---
 
-## qa/ y ux/ — archivos compartidos entre versiones
+## Artefactos en proyectos cliente
 
-| Directorio | Contenido |
-|---|---|
-| `qa/EVIDENCE-PROTOCOL.md` | Cuándo y cómo tomar screenshots como evidencia (con `save_to_disk`) |
-| `qa/README.md` | Clasificación de archivos QA |
-| `ux/README.md` | Clasificación de archivos UX |
-
----
-
-## Archivos compartidos en raíz
-
-| Archivo | Qué es | Usado por |
-|---|---|---|
-| `PALADIN-PLAYBOOK.md` | Jerarquía de 6 niveles para uso eficiente del browser | v1 + v2 |
-| `BRANCH-PROTOCOL.md` | Protocolo de ramas del skill | v2 |
-| `ROADMAP.md` | Roadmap del skill con semver | v1 + v2 |
-| `COMMAND-V2.md` | Puente hacia v2/SKILL-V2-SPEC.md | v2 |
-
----
-
-## Taxonomía con proyectos cliente
-
-Cuando el skill se aplica a un proyecto (Kobra, Lau, etc.):
-
-- **Skill artifacts** → viven acá (`~/.claude/qa-ux/`). Sobre cómo opera el skill.
-- **Journey artifacts** → viven en `<proyecto>/docs/`. Estructura:
+Cuando el skill opera sobre un proyecto:
 
 ```
-docs/
+<proyecto>/docs/
   ux/
-    current/journey-{slug}.md   (storyboard, inversión, persona)
+    current/journey-{slug}.md      (storyboard, inversión, persona — Pasos A-D)
     historico/
   qa/
-    motor.yaml
+    motor.yaml                     (journeys + estado + evidencia_final)
     evidence/{journey}-{tipo}-{fecha}.jpg
     pendientes-humano.md
 ```
@@ -102,6 +91,6 @@ docs/
 
 ## Observaciones empíricas
 
-`observaciones-empiricas/` documenta hallazgos sobre el comportamiento real
-del skill descubiertos mientras opera en proyectos. Cada doc tiene evidencia
-concreta de la corrida que lo disparó. Leer `observaciones-empiricas/README.md`.
+`observaciones-empiricas/` documenta comportamientos reales del skill
+descubiertos en corridas sobre proyectos. Lectura recomendada antes de
+modificar la spec.
