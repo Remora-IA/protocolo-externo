@@ -43,27 +43,19 @@ Arquitecto, Juez) y gate de post-condition antes de cada transición.
 
 ---
 
-## v2 — versión en preparación (experimental)
+## v2 — versión activa (único comando)
 
-**Comando:** `/qa-ux-v2`
-**Archivos:** `v2/SKILL-V2-SPEC.md`, `v2/ROL-ARQUITECTO.md`, `v2/MOVIMIENTO-0-INTENT-STORMING.md`
-**Spec:** `COMMAND-V2.md` (puente) → `v2/SKILL-V2-SPEC.md` (spec completa)
+**Comando:** `/qa-ux`
+**Archivos:** `COMMAND.md` (raíz) → `v2/SKILL-V2-SPEC.md`
 
 Un solo loop iterativo (Pasos A-F) sin fases explícitas. El skill trabaja
 en silencio y sólo surface al founder en 6 momentos definidos. Verificación
 obligatoria con Paladin QA al final (Paso F). Screenshot únicamente como
-evidencia deliberada.
+evidencia deliberada con `save_to_disk`.
 
 Estado de validación:
 - ✅ Capacidades 1, 4, 7 (git-hygiene, impacto UX 3 ejes, WHY como precondición)
 - ⏳ Capacidades 2, 3, 5, 6 + tangibilización end-to-end — pendientes de corrida operadora real
-
-**Cuándo promover v2 como único skill:**
-1. Validar operativamente (una corrida real que entre al loop A-F y produzca vistas)
-2. Eliminar `v1/` de este repositorio
-3. Actualizar `~/.claude/commands/qa-ux.md` para leer `v2/SKILL-V2-SPEC.md`
-4. Eliminar `~/.claude/commands/qa-ux-v2.md`
-5. Renombrar `COMMAND-V2.md` como el único puente activo
 
 ---
 
