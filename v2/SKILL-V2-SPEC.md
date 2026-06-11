@@ -143,6 +143,34 @@ Para el journey activo, ejecutar en orden:
 - El contraste posterior (ideal vs real) usa veredictos cerrados:
   ABSORBE / REEMPLAZA / BORRA / CONSTRUIR — por elemento, con gap.
 
+**BANCO DE PREGUNTAS AUTOMÁTICAS — intent-driven vertical (P-144, validado
+empíricamente 2026-06-10 sobre el nav completo del panel Kobra, 17 entradas
+→ 4 con intent):**
+
+La fase blanco NO está completa hasta responder estas preguntas POR ESCRITO
+en el artefacto — el protocolo se las hace solo, el founder no las dicta:
+
+1. **Inventario de intents:** ¿qué viene a HACER el usuario, en sus palabras,
+   derivado de los momentos del guion del producto (matriz momentos×actores)?
+   Lista numerada I1..In con frecuencia (única vez / diaria / semanal). (JTBD)
+2. **Conteo de clics por intent (GOMS-lite):** para cada intent, tabla
+   camino-actual vs camino-ideal con clics + búsquedas visuales contadas.
+   Regla dura: ninguna decisión sin su evidencia a ≤1 clic, y la acción se
+   toma DONDE se lee la evidencia (Norman, gulf of evaluation).
+3. **Veredicto por entrada de navegación:** cada sub-item del nav declara a
+   qué intent sirve. Sin intent = SUELTO → fusionar, borrar o re-rutear por
+   rol (regla multi-rol: lo que sirve a otro rol se MUEVE, no se borra).
+   (Nielsen, progressive disclosure por rol y fase)
+4. **Jerarquía de caminos por evidencia:** si dos caminos logran el mismo
+   intent (ej. pegar CSV vs link a planilla), la jerarquía visual la decide
+   la medición de rúbrica, no la simetría estética.
+5. **Onboarding de los datos que las vistas usan:** todo dato que una vista
+   muestra o usa para hablar (nombre de la persona, nombre del negocio) debe
+   tener respondido DÓNDE se captura — preferir capturar donde nace (SSO,
+   perfil existente) con micro-pregunta de confirmación, nunca wizard. (Krug)
+6. **Reading por vista:** ¿cuánto texto hay que LEER antes de saber qué hacer?
+   El ideal lo dice en una frase del agente; párrafos = fricción a contar.
+
 ### Paso B — Inversión obligatoria (NO opcional, core)
 
 - Por cada vista del storyboard: walk del peor día. La ruta más
