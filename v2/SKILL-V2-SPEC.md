@@ -183,6 +183,23 @@ en el artefacto — el protocolo se las hace solo, el founder no las dicta:
 
 ### Paso C — Persona-simulation (NO opcional, core)
 
+**PANEL DE PERFILES (P-141, validado 2026-06-10 sobre los 4 estados del
+inicio ideal Kobra):** la simulación NO corre con una persona única — corre
+con la persona de referencia × la biblioteca de perfiles de personalidad del
+proyecto (ej. Kobra: escéptico / apurado / meticuloso, con mapa de empatía
+piensa-siente-necesita-pregunta_asesina en la rúbrica del repo). Por CADA
+estado discreto de cada vista (cognitive walkthrough: parar en cada estado),
+responder el banco situacional: ¿qué necesita el usuario AQUÍ — información,
+corroboración, confianza, salida? ¿puede verificar la afirmación de la vista
+con la evidencia original? ¿sabe qué acepta antes del tap? ¿sabe qué pasa
+después?
+
+**Caveat SOTA 2026 (NN/g, ACM Interactions — obligatorio declararlo):** los
+perfiles sintéticos generan HIPÓTESIS y fricciones candidatas; tienden al
+optimismo y pierden contexto real. Un hallazgo de perfil se reporta como
+hipótesis con su fix candidato — el gate sigue siendo la rúbrica contable +
+evidencia real (browser/roce) + founder decide producto.
+
 - Caminar el storyboard como si fueras el usuario real declarado en la
   conversación inicial. Sin sesgo de "yo lo diseñé". Sin contexto
   privilegiado (no asumir que el usuario sabe lo que el operador
