@@ -125,6 +125,24 @@ Para el journey activo, ejecutar en orden:
   ¿cada pata del JTBD se ejerce? ¿no hay esquivamiento? Si falta
   cobertura, completar antes de seguir al paso B.
 
+**REGLA DURA — Fase blanco sellada (P-140, validada empíricamente
+2026-06-10 sobre el home del panel Kobra, cadena inicio-en-blanco):**
+
+- El Paso A produce un ARTEFACTO (`ideal.md` o sección `## Re-fundación`)
+  que se SELLA (write a disco) ANTES del primer tool call que mire la
+  surface viva — Paladin, screenshot, lectura del componente, lo que sea.
+  El orden de tool calls en el transcript es la verificación: si la
+  sesión leyó surface antes de sellar el ideal, la fase blanco está
+  contaminada y el contraste no vale como output P-140.
+- Inputs permitidos en fase blanco: SOLO docs de producto (WHY, matriz
+  de momentos×actores, rúbrica UX, persona declarada). Código y UI
+  vivos quedan prohibidos hasta el sello.
+- Si la sesión ya vio la surface antes (sesión larga, cadena previa),
+  declarar la contaminación en el artefacto + mitigar citando para cada
+  elemento del ideal la fila/doc del que se deriva — nunca la pantalla.
+- El contraste posterior (ideal vs real) usa veredictos cerrados:
+  ABSORBE / REEMPLAZA / BORRA / CONSTRUIR — por elemento, con gap.
+
 ### Paso B — Inversión obligatoria (NO opcional, core)
 
 - Por cada vista del storyboard: walk del peor día. La ruta más
