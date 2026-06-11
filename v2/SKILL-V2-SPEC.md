@@ -266,6 +266,17 @@ evidencia real (browser/roce) + founder decide producto.
 **Herramienta obligatoria: `mcp__paladin-qa__*` (Paladin QA) — SIEMPRE.**
 **`mcp__Claude_Preview__*` (Claude Preview) está PROHIBIDO en este paso.**
 
+**SCREENCAST OBLIGATORIO (P-137, 2026-06-11):** todo Paso F que recorre
+surfaces produce ADEMÁS de screenshots un screencast (.mp4) del recorrido en
+orden — el flujo como secuencia es donde vive la mitad de la dignidad UX
+(transiciones, cargas, redirects). Mecánica probada: screenshots numerados del
+recorrido → `scripts/screencast-cadena.sh <dir> <salida.mp4>` (ffmpeg
+slideshow; `gif_creator` de Paladin no está implementado en la extensión
+actual). El .mp4 se guarda en `docs/qa/evidence/screencasts/` (o /tmp si es
+exploratorio), se referencia en el spec del PDF de cierre (campo `screencast:`
+del motor P-136) y se entrega por sendVideo al founder. Sin screencast, el
+Paso F con surfaces está INCOMPLETO.
+
 Distinción crítica:
 - Claude Preview = verificación técnica (¿compila? ¿responde el servidor?) — esto NO es Paso F.
 - Paladin QA = verificación de usuario real (¿puede el operador/deudor cumplir su objetivo?) — esto ES Paso F.
