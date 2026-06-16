@@ -1,85 +1,96 @@
-# QA-UX Motor
+# Paladin QA
 
-Skill de Claude Code que camina cualquier producto hasta su outcome
-real, construyendo lo que falta — con tres roles que rotan (Explorador,
-Arquitecto UX/UI, Juez Estratégico) y una checklist viva que sobrevive
-entre rotaciones.
+Sistema completo de QA-UX para Claude Code: extensión de Chrome que da
+acceso al browser + skill que define la metodología para usarlo.
 
-## Archivos activos
-
-| Archivo | Qué es |
-|---|---|
-| `COMMAND.md` | **Orquestador operativo.** El comando `/qa-ux`. El sistema lo lee vía symlink desde `~/.claude/commands/qa-ux.md` (NO editar el symlink — editar este). |
-| `FASES.md` | **Contrato del loop F1–F5.** Pre/post-conditions, secuenciación, gates. Lo lee `COMMAND.md` en Paso 0.1. |
-| `HANDOFF.md` | Corte por contexto y continuación en sesión nueva. Lo invoca COMMAND.md en Paso 7. |
-| `ROL-EXPLORADOR.md` | Postura curiosa + 3 modos (curioso / medido F1 / verificación F5). |
-| `ROL-ARQUITECTO.md` | Diseño UX/UI + 3 modos (gap-driven / generativo F3 / constructor F4). |
-| `ROL-JUEZ.md` | Auditoría + 2 modos (audit-final / derribo F2). |
-| `PALADIN-PLAYBOOK.md` | Orden eficiente de tools del MCP paladin-qa. |
-| `prompts/` | Lentes individuales (sustracción, inversión, fasing, etc.) invocables como subrutinas desde los roles. Incluye `materializar-antes-de-gate.md` — sub-rutina obligatoria al cierre de F2/F3/F5. |
-| `observaciones-empiricas/` | Análisis del propio skill descubiertos mientras se usa en proyectos reales. Cada doc documenta una observación sobre cómo opera el skill, con evidencia empírica de la corrida que lo disparó. Leer `observaciones-empiricas/README.md` para la regla simple de qué va acá. |
-
-## Taxonomía con proyectos cliente
-
-Cuando el skill se aplica a un proyecto (Kobra, Lau, etc.), hay dos
-categorías de docs producidos:
-
-- **Skill artifacts** → viven acá (`~/.claude/qa-ux/`). Son sobre cómo
-  opera el skill — reusables entre proyectos.
-- **Journey artifacts** → viven en `<proyecto>/docs/qa/`. Son sobre el
-  proyecto cliente — F1/F2/F3 reports, gates, canvas, BRIEF, etc.
-
-**Regla simple:**
-> *"¿Este doc le va a servir al skill aplicado en OTRO proyecto?"*
-> Sí → vive acá. No, solo al cliente actual → vive en el cliente.
-
-Si dudás: ¿menciona código/UX/decisiones específicas del cliente?
-- Sí → vive en el cliente.
-- No, habla del skill en abstracto → vive acá.
-
-## Status de `v2/`
-
-Experimento activo. NO está integrado al skill vivo. Contiene M0 Intent
-Storming + ROL-ARQUITECTO con personalidad rediseñadora destructiva. Hay
-evidencia empírica (corrida cobranza-end-to-end 2026-06-03 mañana) de que
-produce insights más profundos que v1. Pendiente: integración con la
-sub-rutina `materializar-antes-de-gate.md` antes de promover. Leer
-`v2/README.md` para detalles.
-
-## Archivado en `historico/`
-
-| Archivo | Por qué archivado |
-|---|---|
-| `MOTOR.md` | Visión histórica del motor antes del state machine. Reemplazado por `FASES.md` (contrato) + `COMMAND.md` (orquestador). |
-| `PROTOCOLO.md` | Versión vieja "modo toolbox" (lentes invocados sueltos sin loop). Reemplazado por el loop F1–F5. Sigue disponible para auditorías frías. |
-
-## Cómo congelar una versión que funciona
+## Instalación
 
 ```bash
+# 1. Clonar en la ubicación correcta (el skill requiere este path)
+git clone https://github.com/Remora-IA/skill-qa-ux.git ~/.claude/qa-ux
+
+# 2. Cargar la extensión en el browser
+#    chrome://extensions → Developer Mode → Load unpacked → seleccionar extension/
+
+# 3. Copiar el extension ID y ejecutar:
 cd ~/.claude/qa-ux
-git status                                # ver qué cambió
-git add -A
-git commit -m "Snapshot: <qué la diferencia>"
-git log --oneline                         # historial de versiones
+./install.sh <extension-id>
+
+# 4. Agregar el MCP server a Claude Code:
+claude mcp add paladin-qa -- node ~/.claude/qa-ux/extension/host/mcp-server.js
 ```
 
-## Cómo volver a una versión anterior
+---
 
-```bash
-cd ~/.claude/qa-ux
-git log --oneline                         # encontrá el hash de la versión
-git checkout <hash>                       # mira esa versión
-git checkout main                         # volvé a la última
+## Estructura del repo
+
+```
+skill-qa-ux/
+  extension/                   ← Extensión Chrome (Paladin QA)
+    manifest.json
+    background.js
+    content.js
+    icons/
+    host/
+      mcp-server.js            ← MCP server (Claude Code lo invoca)
+      native-host.js           ← Native messaging host (el browser lo invoca)
+      package.json
+  install.sh                   ← Instala la extensión + registra el MCP
+  COMMAND.md                   ← Entry point del skill /qa-ux
+  PALADIN-PLAYBOOK.md          ← Jerarquía de herramientas browser
+  BRANCH-PROTOCOL.md           ← Protocolo de ramas
+  ROADMAP.md                   ← Roadmap del skill con semver
+  v2/SKILL-V2-SPEC.md          ← Spec operativa del skill (loop A-F)
+  v1/                          ← Versión anterior (histórico)
+  qa/EVIDENCE-PROTOCOL.md      ← Cuándo y cómo tomar screenshots de evidencia
+  ux/                          ← Metodología de diseño
+  observaciones-empiricas/     ← Hallazgos de corridas reales
 ```
 
-Si querés que una versión vieja se vuelva la actual:
-```bash
-git revert HEAD                           # crea un commit que deshace el último
+---
+
+## Cómo funciona
+
+**La extensión** (`extension/`) se carga en Chrome/Brave/Edge y expone
+herramientas de browser automation vía native messaging. Cuando Claude Code
+invoca `mcp__paladin-qa__*`, el MCP server (`host/mcp-server.js`) recibe
+la llamada y la delega al browser a través del native host.
+
+**El skill** (`COMMAND.md` → `v2/SKILL-V2-SPEC.md`) define la metodología:
+cómo caminar un producto desde teoría hasta verificación en ambiente real,
+qué construir, cómo usar las herramientas del browser eficientemente, y
+cuándo tomar screenshots como evidencia.
+
+**El playbook** (`PALADIN-PLAYBOOK.md`) es el protocolo de uso eficiente:
+jerarquía de 6 niveles (read_page → find → form_input → javascript_tool →
+computer → API). El skill lo sigue; los screenshots son solo evidencia
+deliberada, no navegación.
+
+**Uso:** invocar `/qa-ux` en cualquier sesión de Claude Code sobre el
+proyecto a evaluar. El skill corre en silencio y solo habla al founder
+en 6 momentos definidos.
+
+---
+
+## Artefactos en proyectos cliente
+
+Cuando el skill opera sobre un proyecto:
+
+```
+<proyecto>/docs/
+  ux/
+    current/journey-{slug}.md      (storyboard, inversión, persona — Pasos A-D)
+    historico/
+  qa/
+    motor.yaml                     (journeys + estado + evidencia_final)
+    evidence/{journey}-{tipo}-{fecha}.jpg
+    pendientes-humano.md
 ```
 
-## Si querés compartirlo / subirlo a GitHub
+---
 
-```bash
-cd ~/.claude/qa-ux
-gh repo create qa-ux --private --source=. --push
-```
+## Observaciones empíricas
+
+`observaciones-empiricas/` documenta comportamientos reales del skill
+descubiertos en corridas sobre proyectos. Lectura recomendada antes de
+modificar la spec.

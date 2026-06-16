@@ -1,0 +1,10 @@
+{
+  "name": "paladin-qa-host",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MCP server and native messaging host for Paladin QA (fork of Open Claude in Chrome)",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  }
+}
