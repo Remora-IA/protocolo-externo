@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# Pre-push hook — bloquea operaciones destructivas sobre main y enforza
+# el flujo "main solo recibe lo que draft ya tiene" (merge-por-push) con
+# aprobación humana obligatoria.
+# Activar una vez por clone:  git config core.hooksPath .githooks
+#
+# Reglas (protocolo main-solo-en-origin 2026-06-09):
+#   1. Nunca force-push (--force, --force-with-lease) a main.
+#   2. Nunca borrar main desde remote.
+#   3. Push a main SOLO si el SHA pusheado == HEAD de draft local.
+#      → flujo canónico: git push origin draft && git push origin draft:main
+#   4. Push a main requiere APROBACIÓN HUMANA: el hook pide tipear la frase
+#      DEPLOY_CONFIRM_PHRASE (de config.sh) leyendo de la terminal (/dev/tty).
+#      Claude Code y cualquier automatización corren SIN TTY → bloqueo
+#      físico, no de protocolo. Publicar a main dispara el autodeploy
+#      (Cloud Build us-central1: backend-auto-deploy + landing-auto-deploy).
+
+# Cargar config del repo (genérica si no existe). Define PROTECTED_BRANCH,
+# DEFAULT_BRANCH, DEPLOY_CONFIRM_PHRASE, PROJECT_NAME. Esto hace el hook
+# repo-agnóstico: la frase de deploy y la rama protegida salen del config,
+# no están hardcodeadas a ningún producto.
+hook_repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"
+[ -f "$hook_repo_root/protocolo/config.sh" ] && source "$hook_repo_root/protocolo/config.sh"
+protected_branch="${PROTECTED_BRANCH:-main}"
+default_branch="${DEFAULT_BRANCH:-draft}"
+project_name="${PROJECT_NAME:-$(basename "${hook_repo_root:-$PWD}")}"
+deploy_phrase="${DEPLOY_CONFIRM_PHRASE:-deploy ${project_name}}"
+remote="$1"
+
+# stdin: <local_ref> <local_sha> <remote_ref> <remote_sha>
+while read local_ref local_sha remote_ref remote_sha; do
+  # remote_ref viene como refs/heads/main
+  if [[ "$remote_ref" == "refs/heads/$protected_branch" ]]; then
+
+    # Caso 1: borrado de main (local_sha = 0000...)
+    if [[ "$local_sha" =~ ^0+$ ]]; then
+      echo "ERROR: bloqueado intento de borrar '$protected_branch' en $remote." >&2
+      echo "Ver COLLABORATION.md Regla 0." >&2
+      exit 1
+    fi
+
+    # Caso 2: force-push detectado (remote tiene commits que local no tiene)
+    if [[ ! "$remote_sha" =~ ^0+$ ]]; then
+      if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+        echo "ERROR: bloqueado force-push a '$protected_branch'." >&2
+        echo "El remote tiene commits que tu local no tiene. Hacé 'git pull' y resolvé." >&2
+        echo "NUNCA usar --force sobre main. Ver COLLABORATION.md Regla 0." >&2
+        exit 1
+      fi
+    fi
+
+    # Caso 3: main solo recibe el HEAD actual de draft (merge-por-push).
+    # Flujo canónico: git push origin draft && git push origin draft:main
+    draft_sha="$(git rev-parse "$default_branch" 2>/dev/null)"
+    if [[ -z "$draft_sha" ]]; then
+      echo "ERROR: no existe rama local '$default_branch' — no puedo validar el push a $protected_branch." >&2
+      echo "El protocolo exige que $protected_branch reciba exactamente el HEAD de $default_branch." >&2
+      exit 1
+    fi
+    if [[ "$local_sha" != "$draft_sha" ]]; then
+      echo "ERROR: bloqueado push a '$protected_branch' — el SHA no es el HEAD de $default_branch." >&2
+      echo "  SHA que intentás pushear:       $local_sha" >&2
+      echo "  HEAD de $default_branch local:  $draft_sha" >&2
+      echo "" >&2
+      echo "Protocolo: $protected_branch solo recibe lo que $default_branch ya tiene." >&2
+      echo "  git push origin $default_branch                  # primero $default_branch" >&2
+      echo "  git push origin $default_branch:$protected_branch   # después $protected_branch, mismo SHA, sin switch" >&2
+      exit 1
+    fi
+
+    # Caso 4-bis: VENTANA NOCTURNA (toggle founder 2026-06-10).
+    # Si el founder activó la ventana (make night-deploy-on — requiere TTY,
+    # sigue siendo acto humano), pushes draft→main pasan SIN frase hasta que
+    # expire. El flag .night-deploy contiene el epoch de expiración.
+    # Casos 1-3 (no borrar, no force, solo HEAD de draft) aplican IGUAL.
+    repo_root="${hook_repo_root:-$(git rev-parse --show-toplevel)}"
+    night_flag="$repo_root/.night-deploy"
+    if [[ -f "$night_flag" ]]; then
+      expira="$(cat "$night_flag" 2>/dev/null | head -1)"
+      ahora="$(date +%s)"
+      if [[ "$expira" =~ ^[0-9]+$ ]] && (( ahora < expira )); then
+        echo "[pre-push] VENTANA NOCTURNA activa (expira $(date -r "$expira" '+%H:%M')) — push a $protected_branch autorizado sin frase." >&2
+        echo "[$(date -Iseconds)] night-deploy push $protected_branch sha=$local_sha" >> "/tmp/${project_name}-night-deploys.log"
+        continue
+      else
+        rm -f "$night_flag"
+        echo "[pre-push] Ventana nocturna EXPIRADA — borrada. Sigue flujo normal (frase por TTY)." >&2
+      fi
+    fi
+
+    # Caso 4: aprobación humana — frase de confirmación tipeada en terminal.
+    # Claude Code corre sin TTY: la lectura de /dev/tty le falla SIEMPRE.
+    # Esto convierte la publicación a main (y su autodeploy) en un acto
+    # exclusivamente humano. No hay bypass por variable de entorno.
+    CONFIRM=""
+    if ! { printf "Publicación a %s → puede disparar AUTODEPLOY.\nEscribí la frase '%s' para confirmar: " "$protected_branch" "$deploy_phrase" > /dev/tty; } 2>/dev/null; then
+      echo "ERROR: push a '$protected_branch' bloqueado — requiere terminal interactiva." >&2
+      echo "La publicación a main es un acto humano: corré este comando vos mismo" >&2
+      echo "en una terminal y tipeá la frase de confirmación:" >&2
+      echo "  git push origin draft:main" >&2
+      exit 1
+    fi
+    if ! read -r CONFIRM < /dev/tty 2>/dev/null; then
+      echo "ERROR: no pude leer confirmación desde la terminal — push cancelado." >&2
+      exit 1
+    fi
+    if [[ "$CONFIRM" != "$deploy_phrase" ]]; then
+      echo "ERROR: frase incorrecta ('$CONFIRM') — push a $protected_branch cancelado." >&2
+      exit 1
+    fi
+    echo "Confirmación humana OK — publicando a $protected_branch." > /dev/tty
+  fi
+done
+
+exit 0

@@ -1,0 +1,20 @@
+# docs/PLAN.yml — catálogo de problemas de protocolo-externo.
+#
+# Doctrina (doctrina_split): EL PLAN SIGUE AL CÓDIGO. Este repo tiene su PROPIO
+# PLAN.yml — no se mezcla con el de otro repo. La plantilla y el protocolo viven
+# en el meta-repo Remora-IA/remora → protocolo/colaboracion/PLAN.template.yml.
+#
+# IDs: prefijo PE-XXX (único de este repo, no reusar entre repos).
+# El hook pre-commit valida docs/PLAN*.yml cuando hay un validador disponible.
+
+schema_version: 4
+proyecto: protocolo-externo
+last_updated: "0000-00-00T00:00:00"  # placeholder string (YAML válido); lo regenera el indexador
+
+problemas:
+  - id: PE-001
+    titulo: "Cargar los problemas reales de protocolo-externo en este catálogo"
+    dominio: bootstrap
+    por_que: "Esta ficha se sembró al adoptar el protocolo de colaboración. Reemplazarla por los problemas reales del repo (deuda técnica, features pendientes, bugs conocidos)."
+    estado: pending
+    owner: "-"

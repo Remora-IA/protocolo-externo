@@ -1,0 +1,34 @@
+# PLAN.template.yml — catálogo de problemas de UN repo.
+#
+# Doctrina (doctrina_split, kobra/dominios/MIGRACION-DDD.yml): EL PLAN SIGUE
+# AL CÓDIGO. Un repo tiene su PROPIO PLAN.yml — no se mezcla con el de otro.
+# Mientras el código de un motor viva dentro de otro repo, su problema es de
+# ese repo (no se duplica). Cuando el código se muda a su repo, su PLAN se muda
+# con él.
+#
+# Por qué NO un PLAN.yml gigante compartido:
+#   - El catálogo es un grafo de dependencias entre problemas. Partirlo a mano
+#     pierde trazabilidad. Pero juntar repos distintos en un solo archivo pierde
+#     el aislamiento (una sesión que pide "el próximo problema" ve ruido de otro
+#     producto).
+#   - Regla de corte: separación FÍSICA por repo; dentro de un repo con varios
+#     dominios, un solo PLAN.yml con campo `dominio` por ficha y vistas
+#     generadas (no N archivos sueltos).
+#
+# IDs: prefijo por repo/dominio (ej. CA-XXX carolina, P-XXX kobra, C-XXX
+# cargador). NO reusar prefijos entre repos.
+#
+# Para empezar: copiá este archivo a docs/PLAN.yml del repo, borrá los ejemplos,
+# y cargá los problemas reales. El hook pre-commit valida docs/PLAN*.yml.
+
+schema_version: 4
+proyecto: NOMBRE-DEL-REPO            # = PROJECT_NAME de protocolo/config.sh
+last_updated: "0000-00-00T00:00:00"  # placeholder string; lo regenera el indexador (make plan-index). Comillado: una fecha 0000-00-00 cruda rompe parsers YAML estrictos.
+
+problemas:
+  - id: XX-001
+    titulo: "Descripción del problema en términos de qué se rompe / qué falta"
+    dominio: nombre-del-modulo       # para agrupar vistas dentro del repo
+    por_que: "Por qué importa: a qué métrica/why del producto sirve resolverlo."
+    estado: pending                  # pending | in_progress | blocked | resolved
+    owner: "-"                       # quién lo está tomando (el 'claim' del problema)

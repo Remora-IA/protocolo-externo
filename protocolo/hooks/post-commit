@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Post-commit hook — automatizaciones que reaccionan a lo que ENTRÓ al repo.
+# Regla: este hook JAMÁS bloquea ni falla un commit. Todo corre best-effort
+# en background y deja log en /tmp.
+
+# LFS estándar (hooksPath custom lo desactiva por default — lo re-cableamos acá)
+command -v git-lfs >/dev/null 2>&1 && git lfs post-commit "$@" 2>/dev/null || true
+
+# ────────────────────────────────────────────────────────────────
+# P-184 — Tablero Kanban vivo: si el commit tocó el catálogo PLAN*,
+# re-derivar el tablero y publicarlo a prod (vista /panel/plan).
+# El catálogo es la fuente; el tablero es una vista derivada — esto
+# garantiza que NUNCA diverjan sin depender de la memoria de nadie.
+# ────────────────────────────────────────────────────────────────
+if git diff-tree --no-commit-id --name-only -r HEAD 2>/dev/null \
+     | grep -qE '^docs/PLAN(-BACKLOG|-RESOLVED)?\.yml$'; then
+  if [[ -f scripts/plan-board-push.sh ]]; then
+    nohup bash scripts/plan-board-push.sh \
+      >> /tmp/kobra-plan-board-push.log 2>&1 &
+    echo "[post-commit] catálogo tocado → re-publicando tablero /panel/plan en background (log: /tmp/kobra-plan-board-push.log)"
+  fi
+fi
+
+exit 0

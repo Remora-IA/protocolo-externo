@@ -1,0 +1,229 @@
+#!/usr/bin/env bash
+# Pre-commit hook — enforcement de LFS locking.
+# Activar una vez por clone:  git config core.hooksPath .githooks
+#
+# Regla (COLLABORATION.md Regla 6):
+#   Antes de commitear cambios en cualquier archivo, ese archivo DEBE
+#   estar lockeado por vos vía git lfs lock. Esto garantiza que otras
+#   sesiones paralelas se enteren de tu intención antes de que ocurra
+#   la colisión.
+#
+# Excepciones (commits permitidos sin lock):
+#   - Archivos creados nuevos (untracked → added): no requieren lock previo
+#     porque otra sesión no puede estarlos editando.
+#   - Archivos borrados completamente: si los estás borrando, lockeás el path.
+#   - Commits en docs/STATUS.yml, docs/REGISTRO-ERRORES.md y docs/claims/*:
+#     son journals que TODA sesión actualiza al terminar — lockearlos
+#     bloquearía el cierre de todas las demás.
+#   - Merge commits: git los genera con archivos resueltos, no estás editando.
+#
+# Si el hook te bloquea, NO uses --no-verify. Lockeá el archivo, reintentá.
+# Si no podés lockear (otra sesión lo tiene), parar y resolver según Regla 6
+# COLLABORATION.md (esperar señal o force-unlock si tiene >2h).
+
+# ────────────────────────────────────────────────────────────────
+# P-111 — Validación del catálogo PLAN* (corre ANTES que el check LFS
+# para cubrir también merges y entornos sin LFS).
+# Si el commit toca docs/PLAN*.yml, el contenido staged debe ser válido:
+# parse YAML, IDs únicos, sin fantasmas, sin resolved en HOT, hito
+# declarado en HOT, índices sincronizados con los bloques.
+# ────────────────────────────────────────────────────────────────
+if git diff --cached --name-only | grep -qE '^docs/PLAN(-BACKLOG|-RESOLVED)?\.yml$'; then
+    if [[ -f scripts/validate-plan.py ]] && command -v python3 &>/dev/null; then
+        if ! python3 scripts/validate-plan.py --staged; then
+            echo
+            echo "✗ COMMIT BLOQUEADO — catálogo PLAN* inválido (P-111)."
+            echo "  Arreglá los errores reportados arriba y reintentá."
+            echo "  Si el error es índice desincronizado:"
+            echo "      make plan-index && git add docs/PLAN*.yml"
+            echo "  NO uses --no-verify — un catálogo roto desorienta a TODAS las sesiones."
+            echo
+            exit 1
+        fi
+    fi
+fi
+
+# Si LFS no está instalado, no bloquear (entornos donde LFS no aplica).
+if ! command -v git-lfs &>/dev/null && ! git lfs version &>/dev/null 2>&1; then
+    exit 0
+fi
+
+# Merge commit: saltar.
+if [[ -f .git/MERGE_HEAD ]] || [[ -f .git/CHERRY_PICK_HEAD ]] || [[ -f .git/REBASE_HEAD ]]; then
+    exit 0
+fi
+
+# Archivos exentos (journals que múltiples sesiones tocan al cerrar).
+EXEMPT_PATTERNS=(
+    "^docs/STATUS\.yml$"
+    "^docs/REGISTRO-ERRORES\.md$"
+    "^docs/claims/"
+    "^docs/PROTOCOLO-MEJORA\.md$"
+)
+
+is_exempt() {
+    local file="$1"
+    for pat in "${EXEMPT_PATTERNS[@]}"; do
+        [[ "$file" =~ $pat ]] && return 0
+    done
+    return 1
+}
+
+# Obtener username LFS actual (para comparar contra owner del lock).
+LFS_USER=$(git config --get user.name 2>/dev/null || git config --get user.email 2>/dev/null)
+
+# Cache de locks activos (una sola llamada al server).
+LOCKS=$(git lfs locks 2>/dev/null || true)
+
+# Archivos modificados a commitear — solo M (Modified).
+# A (Added): nuevos, no requieren lock (otra sesión no puede editarlos).
+# D (Deleted): si estoy borrando, no hay edición concurrente posible —
+#   el lock no protege nada. Exigirlo solo bloquea cleanup legítimo.
+CHANGED=$(git diff --cached --name-status --diff-filter=M | awk '{print $2}')
+
+if [[ -z "$CHANGED" ]]; then
+    exit 0
+fi
+
+MISSING_LOCKS=()
+WRONG_OWNER=()
+
+while IFS= read -r file; do
+    [[ -z "$file" ]] && continue
+    is_exempt "$file" && continue
+
+    # ¿Está lockeado?
+    lock_line=$(echo "$LOCKS" | awk -v f="$file" '$1 == f {print; exit}')
+
+    if [[ -z "$lock_line" ]]; then
+        MISSING_LOCKS+=("$file")
+    else
+        # Sí está lockeado — ¿soy yo el dueño? (case-insensitive: GitHub LFS
+        # normaliza el username con capitalización, git config puede tener
+        # otro casing).
+        owner=$(echo "$lock_line" | awk '{print $2}')
+        if [[ -n "$LFS_USER" && "${owner,,}" != "${LFS_USER,,}" ]]; then
+            WRONG_OWNER+=("$file ($owner)")
+        fi
+    fi
+done <<< "$CHANGED"
+
+if [[ ${#MISSING_LOCKS[@]} -gt 0 || ${#WRONG_OWNER[@]} -gt 0 ]]; then
+    echo
+    echo "✗ COMMIT BLOQUEADO — falta lockear archivos modificados (Regla 6 COLLABORATION.md)."
+    echo
+
+    if [[ ${#MISSING_LOCKS[@]} -gt 0 ]]; then
+        echo "Archivos modificados sin lock:"
+        for f in "${MISSING_LOCKS[@]}"; do
+            echo "    $f"
+        done
+        echo
+        echo "Para resolver, ejecutá:"
+        for f in "${MISSING_LOCKS[@]}"; do
+            echo "    git lfs lock \"$f\""
+        done
+        echo
+    fi
+
+    if [[ ${#WRONG_OWNER[@]} -gt 0 ]]; then
+        echo "Archivos lockeados por OTRA sesión:"
+        for entry in "${WRONG_OWNER[@]}"; do
+            echo "    $entry"
+        done
+        echo
+        echo "→ Coordiná: esperar señal de la otra sesión (push a draft) o force-unlock"
+        echo "  si tiene más de 2h sin actividad (Regla 6 COLLABORATION.md)."
+        echo
+    fi
+
+    echo "Si no podés lockear (otra sesión lo tiene): esperar señal (push)"
+    echo "o force-unlock si tiene >2h (Regla 6 COLLABORATION.md)."
+    echo "NO uses --no-verify — viola el protocolo y rompe coordinación."
+    echo
+    exit 1
+fi
+
+# ────────────────────────────────────────────────────────────────
+# P-186 — Scope-check físico de commits (fricción #5 del equipo P-176).
+# Convierte la regla pathspec de texto (saltable) en física (no saltable).
+# El spawner exporta SPAWN_SCOPE_PATHS=<globs coma-separados> a la hija;
+# este check rechaza commits con archivos staged fuera del scope declarado.
+#
+# El incidente 11-jun 17:55 (commit c463cbb): una hermana commiteó con SU
+# mensaje archivos staged que eran trabajo de la constructora del Kanban.
+# Los LFS locks no separan sesiones del MISMO usuario git (charlie-dev-remora),
+# y la regla pathspec de texto era salteable por accidente o por presión.
+#
+# Sesiones interactivas SIN la var → no se filtra por scope (este bloque
+# ni se ejecuta); siguen rigiéndose solo por el LFS check de arriba.
+#
+# NOTA: Este archivo es el espejo de .githooks/pre-commit (ver
+# protocolo/install.sh + COLLABORATION.md § "hooks espejados"). El
+# enforcement real corre desde .githooks/ vía core.hooksPath; este espejo
+# queda como referencia canónica para diffs y para entornos donde el
+# install.sh lo eligió.
+# ────────────────────────────────────────────────────────────────
+if [[ -n "${SPAWN_SCOPE_PATHS:-}" ]]; then
+    # Parsear la lista coma-separada en array de globs.
+    IFS=',' read -ra SCOPE_GLOBS <<< "$SPAWN_SCOPE_PATHS"
+
+    # El scope-check aplica a TODO lo staged (A, M, D, T, R, C) — distinto
+    # del LFS check de arriba que filtra solo M/D (un archivo nuevo no
+    # necesita lock, pero sí debe caer dentro del scope si la sesión fue
+    # spawneada con scope declarado).
+    SCOPE_CHANGED=$(git diff --cached --name-only)
+
+    OUT_OF_SCOPE=()
+    while IFS= read -r file; do
+        [[ -z "$file" ]] && continue
+        is_exempt "$file" && continue   # journals exentos (Plan, Status, etc.)
+
+        matched=0
+        for glob in "${SCOPE_GLOBS[@]}"; do
+            # shellcheck disable=SC2053
+            if [[ "$file" == $glob ]]; then
+                matched=1
+                break
+            fi
+        done
+
+        if [[ $matched -eq 0 ]]; then
+            OUT_OF_SCOPE+=("$file")
+        fi
+    done <<< "$SCOPE_CHANGED"
+
+    if [[ ${#OUT_OF_SCOPE[@]} -gt 0 ]]; then
+        echo
+        echo "✗ COMMIT BLOQUEADO — scope-check (P-186):"
+        echo "  Archivos staged fuera de SPAWN_SCOPE_PATHS declarado por la madre:"
+        for f in "${OUT_OF_SCOPE[@]}"; do
+            echo "    $f"
+        done
+        echo
+        echo "  Esta sesión fue spawneada con un scope declarado por la orquestadora"
+        echo "  (scripts/spawn-sibling-ui.sh deriva el scope de PLAN.yml.recursos)."
+        echo "  No puede commitear archivos fuera de él — si los tiene en el"
+        echo "  working tree, es que otra sesión los puso ahí (fricción #5 del"
+        echo "  benchmark 10x engineer)."
+        echo
+        echo "  Para resolver:"
+        echo "    1. Identificá de quién son: git log -1 -- <archivo>"
+        echo "    2. Si son de la OTRA hermana → esperá su push a draft (signal"
+        echo "       de que terminó) o unstash + rebase del working tree."
+        echo "    3. Si son tuyos pero no estaban en el scope → pedile a la"
+        echo "       madre que relance el spawn con scope extendido, o"
+        echo "       re-spawneá vos mismo con la var actualizada."
+        echo
+        echo "  Journals exentos (siempre OK en cualquier scope):"
+        echo "    docs/STATUS.yml, docs/REGISTRO-ERRORES.md, docs/claims/*,"
+        echo "    docs/PROTOCOLO-MEJORA.md."
+        echo
+        echo "  NO uses --no-verify — viola el protocolo y es exactamente la"
+        echo "  clase de problema que P-186 busca impedir."
+        echo
+        exit 1
+    fi
+fi
+
+exit 0
